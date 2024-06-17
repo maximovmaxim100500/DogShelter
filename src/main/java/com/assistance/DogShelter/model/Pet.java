@@ -1,5 +1,6 @@
 package com.assistance.DogShelter.model;
 
+import com.assistance.DogShelter.enums.Food;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,4 +23,7 @@ public class Pet {
     private String breed;
     @Column(nullable = false)
     private int age;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Food food;
 }

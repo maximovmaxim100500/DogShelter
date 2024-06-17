@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: liquibase/scripts/tables.sql
+  - include:
+      file: liquibase/scripts/pets-tables.sql
+  - include:
+      file: liquibase/scripts/pet-avatars-tables.sql
