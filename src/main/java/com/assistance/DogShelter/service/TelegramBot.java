@@ -58,11 +58,11 @@ public class TelegramBot extends TelegramLongPollingBot {
             long chatId = update.getCallbackQuery().getMessage().getChatId();
 
             switch (callbackData) {
-                case "Stray_dogs" -> {
+                case "Приют_1" -> {
                     String text = "Приют " + callbackData + ". Выберете действие:";
                     shelterMenu(chatId, messageId, text);
                 }
-                case "Pick_up_the_dog" -> {
+                case "Приют_2" -> {
                     String text = "Приют Pick up the dog. Выберете действие:";
                     shelterMenu(chatId, messageId, text);
                 }
@@ -70,6 +70,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "TakeTheDog" -> sendMessage(chatId, "Чтобы взять собаку нужно...");
                 case "DogReport" -> sendMessage(chatId, "Вот ваш отчет");
                 case "CallVolunteer" -> sendMessage(chatId, "Зовем волонтера");
+                case "ComeBack1" -> choosingShelter(chatId);
             }
         }
     }
@@ -111,19 +112,19 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void choosingShelter(long chatId) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText("Choose a shelter");
+        sendMessage.setText("Выберете приют");
 
         InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup();
         List<InlineKeyboardButton> rowInLine = new ArrayList<>(); //Список одного ряда кнопок
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();//Список списков наших кнопок
 
         var buttonStrayDogs = new InlineKeyboardButton(); //создаем кнопку
-        buttonStrayDogs.setText("Stray dogs"); //текст кнопки
-        buttonStrayDogs.setCallbackData("Stray_dogs"); //данные, которые кнопка отправляет боту при ее нажатии
+        buttonStrayDogs.setText("Приют 1"); //текст кнопки
+        buttonStrayDogs.setCallbackData("Приют_1"); //данные, которые кнопка отправляет боту при ее нажатии
 
         var buttonPickUpTheDog = new InlineKeyboardButton();//создаем кнопку
-        buttonPickUpTheDog.setText("Pick up the dog");//текст кнопки
-        buttonPickUpTheDog.setCallbackData("Pick_up_the_dog");//данные, которые кнопка отправляет боту при ее нажатии
+        buttonPickUpTheDog.setText("Приют 2");//текст кнопки
+        buttonPickUpTheDog.setCallbackData("Приют_2");//данные, которые кнопка отправляет боту при ее нажатии
 
         rowInLine.add(buttonStrayDogs); //порядок создания имеет значение
         rowInLine.add(buttonPickUpTheDog);
@@ -151,6 +152,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<InlineKeyboardButton> rowInLine2 = new ArrayList<>(); //Список второго ряда кнопок
         List<InlineKeyboardButton> rowInLine3 = new ArrayList<>(); //Список третьего ряда кнопок
         List<InlineKeyboardButton> rowInLine4 = new ArrayList<>(); //Список четвертого ряда кнопок
+        List<InlineKeyboardButton> rowInLine5 = new ArrayList<>(); //Список четвертого ряда кнопок
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();//Список списков наших кнопок
 
         var buttonShelterInfo = new InlineKeyboardButton();
@@ -169,6 +171,10 @@ public class TelegramBot extends TelegramLongPollingBot {
         buttonCallVolunteer.setText("Позвать волонтера");
         buttonCallVolunteer.setCallbackData("CallVolunteer");
 
+        var buttonBack = new InlineKeyboardButton();
+        buttonCallVolunteer.setText("Назад");
+        buttonCallVolunteer.setCallbackData("ComeBack1");
+
         rowInLine1.add(buttonShelterInfo);
         rowInLine2.add(buttonTakeTheDog);
         rowInLine3.add(buttonDogReport);
@@ -177,6 +183,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         rowsInLine.add(rowInLine2);
         rowsInLine.add(rowInLine3);
         rowsInLine.add(rowInLine4);
+        rowsInLine.add(rowInLine5);
 
         markupInLine.setKeyboard(rowsInLine); //этот метод устанавливает наш список кнопок
         message.setReplyMarkup(markupInLine);//этот метод прикрепляет нашу клавиатуру к сообщению, которое будет
