@@ -5,3 +5,7 @@ databaseChangeLog:
       file: liquibase/scripts/pets-tables.sql
   - include:
       file: liquibase/scripts/pet-avatars-tables.sql
+  - include:
+      file: liquibase/scripts/shelter-tables.sql
+  - include:
+      file: liquibase/scripts/drive-dir-picture.sql
