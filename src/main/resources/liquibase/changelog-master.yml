@@ -1,10 +1,10 @@
 databaseChangeLog:
   - include:
-      file: liquibase/scripts/volunteers-tables.sql
-  - include:
       file: liquibase/scripts/pets-tables.sql
   - include:
       file: liquibase/scripts/pet-avatars-tables.sql
+  - include:
+      file: liquibase/scripts/volunteers-tables.sql
   - include:
       file: liquibase/scripts/shelters-tables.sql
   - include:
