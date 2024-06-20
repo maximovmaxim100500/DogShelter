@@ -1,6 +1,7 @@
 package com.assistance.DogShelter.model;
 
 import com.assistance.DogShelter.enums.Food;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,15 +16,22 @@ import lombok.NoArgsConstructor;
 public class Pet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Exclude
-    private long id;
-    @Column(nullable = false)
-    private String name;
-    @Column(nullable = false)
-    private String breed;
-    @Column(nullable = false)
-    private int age;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Food food;
+    private long id;            // id питомца
+
+    @Column(name = "name", nullable = false)
+    private String name;        // имя питомца
+
+    @Column(name = "breed", nullable = false)
+    private String breed;       // порода питомца
+
+    @Column(name = "age", nullable = false)
+    private int age;            // возраст питомца
+
+    @Column(name = "food")
+    private String food;        // предпочитаемая еда питомца
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties("pets")
+    private User user;          // связать с классом User
 }
