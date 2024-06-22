@@ -100,17 +100,17 @@ public class VolunteerController {
         return (Volunteer) ResponseEntity.status(HttpStatus.OK);
     }
 
-    /**
-     * Обрабатывает DELETE-запрос для удаления волонтера
-     *
-     * @param chatId Идентификатор Телеграм волонтера для удаления
-     * @return Подтверждение успешного удаления волонтера
-     */
-    @DeleteMapping("{chatId}")
-    public Volunteer deleteVolunteerChatId(@PathVariable Long chatId) {
-        volunteerService.deleteVolunteerChatId(chatId);
-        return (Volunteer) ResponseEntity.status(HttpStatus.OK);
-    }
+//    /**
+//     * Обрабатывает DELETE-запрос для удаления волонтера
+//     *
+//     * @param chatId Идентификатор Телеграм волонтера для удаления
+//     * @return Подтверждение успешного удаления волонтера
+//     */
+//    @DeleteMapping("{chatId}")
+//    public Volunteer deleteVolunteerChatId(@PathVariable Long chatId) {
+//        volunteerService.deleteVolunteerChatId(chatId);
+//        return (Volunteer) ResponseEntity.status(HttpStatus.OK);
+//    }
 
     @GetMapping("/all")
     public ResponseEntity<Collection<Volunteer>> getAllVolunteers() {

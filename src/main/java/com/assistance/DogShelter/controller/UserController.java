@@ -83,17 +83,17 @@ public class UserController {
         return (User) ResponseEntity.status(HttpStatus.OK);
     }
 
-    /**
-     * Обрабатывает DELETE-запрос для удаления пользователя по его идентификатору Телеграм
-     *
-     * @param chatId Идентификатор Телеграм волонтера для удаления
-     * @return Подтверждение успешного удаления волонтера
-     */
-    @DeleteMapping("{chatId}")
-    public User deleteUserChatId(@PathVariable Long chatId) {
-        userService.deleteUserChatId(chatId);
-        return (User) ResponseEntity.status(HttpStatus.OK);
-    }
+//    /**
+//     * Обрабатывает DELETE-запрос для удаления пользователя по его идентификатору Телеграм
+//     *
+//     * @param chatId Идентификатор Телеграм волонтера для удаления
+//     * @return Подтверждение успешного удаления волонтера
+//     */
+//    @DeleteMapping("{chatId}")
+//    public User deleteUserChatId(@PathVariable Long chatId) {
+//        userService.deleteUserChatId(chatId);
+//        return (User) ResponseEntity.status(HttpStatus.OK);
+//    }
 
     @GetMapping("/all")
     public ResponseEntity<Collection<User>> getAllUsers() {

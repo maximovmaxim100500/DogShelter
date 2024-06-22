@@ -99,15 +99,15 @@ public class VolunteerService {
         volunteerRepository.deleteById(id);
     }
 
-    /**
-     * Метод удаляет волонтера по уникальному идентификатору Телеграм из базы данных.
-     *
-     * @param chatId
-     */
-    public void deleteVolunteerChatId(Long chatId) {
-        var id = volunteerRepository.findByChatId(chatId).get().getId();
-        volunteerRepository.deleteById(id);
-    }
+//    /**
+//     * Метод удаляет волонтера по уникальному идентификатору Телеграм из базы данных.
+//     *
+//     * @param chatId
+//     */
+//    public void deleteVolunteerChatId(Long chatId) {
+//        var id = volunteerRepository.findByChatId(chatId).get().getId();
+//        volunteerRepository.deleteById(id);
+//    }
 
     /**
      * Метод выводит список всех зарегистрированных волонтёров.
