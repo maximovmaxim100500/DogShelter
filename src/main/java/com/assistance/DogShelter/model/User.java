@@ -32,5 +32,6 @@ public class User {
     private String phoneNumber;   // номер телефона пользователя
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Pet> pets;        // связать с классом Pet
 }
