@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * Модель, представляющая питомца.
+ */
 @Entity
 @Table(name = "pets")
 @Data

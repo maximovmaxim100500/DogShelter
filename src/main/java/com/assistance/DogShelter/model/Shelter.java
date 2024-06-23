@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * Модель, представляющая приют.
+ */
 @Entity
 @Table(name = "shelters")
 @Data

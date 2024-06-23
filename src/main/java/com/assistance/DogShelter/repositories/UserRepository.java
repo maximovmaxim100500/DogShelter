@@ -7,5 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    /**
+     * Ищет пользователя по идентификатору чата.
+     *
+     * @param chatId идентификатор чата
+     * @return Optional, содержащий пользователя, если найден
+     */
     Optional<User> findByChatId(long chatId);
 }

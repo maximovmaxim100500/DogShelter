@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * Модель для представления изображений, загруженных в хранилище.
+ */
 @Entity
 @Table(name = "drive_dir_picture")
 @Data
@@ -16,12 +19,28 @@ public class DriveDirPicture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Exclude
     private long id;
+
+    /**
+     * Путь к файлу изображения.
+     */
     @Column(nullable = false)
     private String filePath;
+
+    /**
+     * Размер файла изображения.
+     */
     @Column(nullable = false)
     private long fileSize;
+
+    /**
+     * Тип медиа файла изображения.
+     */
     @Column(nullable = false)
     private String mediaType;
+
+    /**
+     * Данные изображения в виде массива байт.
+     */
     @Lob
     @Column(nullable = false)
     private byte[] data;
