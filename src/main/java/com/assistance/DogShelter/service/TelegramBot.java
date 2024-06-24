@@ -20,13 +20,23 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Основной класс Telegram бота для приюта для собак.
+ * Обрабатывает команды и взаимодействует с пользователями через Telegram.
+ */
 @Component
 @Slf4j
 public class TelegramBot extends TelegramLongPollingBot {
     private final BotConfig botConfig;
 
+    /**
+     * Конструктор класса TelegramBot.
+     * @param botConfig Конфигурация бота.
+     */
     public TelegramBot(@Autowired BotConfig botConfig) {
         this.botConfig = botConfig;
+        // Устанавливаем список команд для бота при его создании
         List<BotCommand> listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/start", "начать"));
         listOfCommands.add(new BotCommand("/help", "помощь"));
@@ -49,9 +59,13 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        // Проверяем, получено ли сообщение и содержит ли оно текст
         if (update.hasMessage() && update.getMessage().hasText()) {
+            // Получаем текст сообщения и id чата
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
+
+            // Обрабатываем сообщение в зависимости от его содержания
             switch (messageText) {
                 case "/start":
                     startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
@@ -86,12 +100,22 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    /**
+     * Обрабатывает команду /start.
+     * @param chatId Идентификатор чата.
+     * @param name Имя пользователя.
+     */
     public void startCommandReceived(long chatId, String name) {
         String answer = "Hi, " + name + "! Nice to meet you!";
         log.info("Replied to " + name);
         sendMessage(chatId, answer);
     }
 
+    /**
+     * Отправляет сообщение в чат.
+     * @param chatId Идентификатор чата.
+     * @param textToSend Текст сообщения.
+     */
     private void sendMessage(long chatId, String textToSend) {
         SendMessage sendMessage = new SendMessage(); //специальный класс для отправки сообщений
         sendMessage.setChatId(String.valueOf(chatId));
@@ -107,6 +131,10 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    /**
+     * Создает клавиатуру для отправляемого сообщения.
+     * @param sendMessage Сообщение, к которому прикрепляется клавиатура.
+     */
     private void creatingKeyboard(SendMessage sendMessage) {//Создаем кнопки клавиатуры
         //Как я понял, кнопки клавиатуры создаются один раз и будут висеть внизу всегда, пока мы их не заменим на другие
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup(); // инжектим специальный класс разметки клавиатуры
@@ -120,6 +148,10 @@ public class TelegramBot extends TelegramLongPollingBot {
         //отправлено пользователю
     }
 
+    /**
+     * Отправляет сообщение пользователю для выбора приюта.
+     * @param chatId Идентификатор чата.
+     */
     private void choosingShelter(long chatId) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
@@ -152,6 +184,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    /**
+     * Отправляет меню для выбранного приюта.
+     * @param chatId Идентификатор чата.
+     * @param messageId Идентификатор сообщения.
+     * @param text Текст сообщения.
+     */
     private void shelterMenu(long chatId, long messageId, String text) {
         EditMessageText message = new EditMessageText(); //специальный класс для замены последнего сообщения
         message.setChatId(String.valueOf(chatId));

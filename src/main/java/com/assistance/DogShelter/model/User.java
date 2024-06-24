@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Модель, представляющая пользователя.
+ */
 @Entity
 @Table(name = "users", schema = "public")
 @Data

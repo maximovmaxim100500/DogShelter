@@ -8,5 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    /**
+     * Ищет пользователя по идентификатору чата.
+     *
+     * @param chatId идентификатор чата
+     * @return Optional, содержащий пользователя, если найден
+     */
     Optional<User> findByChatId(long chatId);
 }

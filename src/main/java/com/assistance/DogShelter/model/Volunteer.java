@@ -7,6 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+/**
+ * Класс, представляющий волонтера.
+ * Содержит информацию о волонтере, такую как имя и номер телефона.
+ */
 @Entity
 @Table(name = "volunteers", schema = "public")
 @Data
@@ -21,6 +26,6 @@ public class Volunteer {
     private long chatId;          // id волонтера в Telegram
     @Column(name = "name", nullable = false)
     private String name;          // имя волонтера
-   @Column(name = "is_busy", nullable = false)
+    @Column(name = "is_busy", nullable = false)
     private boolean isBusy;       //статус волонтёра (занят)
 }
