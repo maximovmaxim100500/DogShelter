@@ -36,7 +36,7 @@ public class VolunteerController {
      * Обрабатывает POST-запрос для добавления нового волонтера.
      *
      * @param volunteer Переданный волонтер в теле запроса.
-     * @return волонтер , который был добавлен с помощью сервиса.
+     * @return волонтер, который был добавлен с помощью сервиса.
      */
     @PostMapping("/add")
     @Operation(summary = "Add volunteer",
@@ -45,9 +45,9 @@ public class VolunteerController {
                     @ApiResponse(responseCode = "201", description = "Successfully created"),
                     @ApiResponse(responseCode = "400", description = "Invalid request")
             })
-    public Volunteer addVolunteer(@RequestBody Volunteer volunteer) {
+    public ResponseEntity<Volunteer> addVolunteer(@RequestBody Volunteer volunteer) {
         Volunteer addVolunteer = volunteerService.addVolunteer(volunteer);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addVolunteer).getBody();
+        return ResponseEntity.status(HttpStatus.CREATED).body(volunteer);
     }
 
     /**
@@ -81,7 +81,7 @@ public class VolunteerController {
     @Operation(summary = "Update volunteer",
             description = "Updates a volunteer's information",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully removed"),
+                    @ApiResponse(responseCode = "200", description = "Successfully updated"),
                     @ApiResponse(responseCode = "400", description = "Invalid request"),
                     @ApiResponse(responseCode = "404", description = "Volunteer not found")
             })
@@ -128,7 +128,7 @@ public class VolunteerController {
     @Operation(summary = "Remove volunteer",
             description = "Removes a volunteer from the system",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully updated"),
+                    @ApiResponse(responseCode = "200", description = "Successfully removed"),
                     @ApiResponse(responseCode = "400", description = "Invalid request"),
                     @ApiResponse(responseCode = "404", description = "Volunteer not found")
             })
@@ -140,17 +140,27 @@ public class VolunteerController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-//    /**
-//     * Обрабатывает DELETE-запрос для удаления волонтера
-//     *
-//     * @param chatId Идентификатор Телеграм волонтера для удаления
-//     * @return Подтверждение успешного удаления волонтера
-//     */
-//    @DeleteMapping("{chatId}")
-//    public Volunteer deleteVolunteerChatId(@PathVariable Long chatId) {
-//        volunteerService.deleteVolunteerChatId(chatId);
-//        return (Volunteer) ResponseEntity.status(HttpStatus.OK);
-//    }
+    /**
+     * Обрабатывает DELETE-запрос для удаления волонтера по Телеграм ID
+     *
+     * @param chatId Идентификатор Телеграм волонтера для удаления
+     * @return Подтверждение успешного удаления волонтера
+     */
+    @DeleteMapping("/chatId/{chatId}")
+    @Operation(summary = "Remove volunteer by Telegram ID",
+            description = "Removes a volunteer by Telegram ID from the system",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully removed"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "Volunteer not found")
+            })
+    public ResponseEntity<Void> deleteVolunteerChatId(@PathVariable Long chatId) {
+        if (volunteerService.findVolunteerByChatId(chatId).isPresent()) {
+            volunteerService.deleteVolunteerChatId(chatId);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 
     @GetMapping("/all")
     @Operation(summary = "Get all volunteers",

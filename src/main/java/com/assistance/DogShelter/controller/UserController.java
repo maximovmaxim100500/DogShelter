@@ -43,9 +43,9 @@ public class UserController {
                     @ApiResponse(responseCode = "201", description = "Successfully created"),
                     @ApiResponse(responseCode = "400", description = "Invalid request")
             })
-    public User addUser(@RequestBody User user) {
+    public ResponseEntity<User> addUser(@RequestBody User user) {
         User addUser = userService.addUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addUser).getBody();
+        return ResponseEntity.status(HttpStatus.CREATED).body(addUser);
     }
 
     /**
@@ -114,17 +114,27 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-//    /**
-//     * Обрабатывает DELETE-запрос для удаления пользователя по его идентификатору Телеграм
-//     *
-//     * @param chatId Идентификатор Телеграм волонтера для удаления
-//     * @return Подтверждение успешного удаления волонтера
-//     */
-//    @DeleteMapping("{chatId}")
-//    public User deleteUserChatId(@PathVariable Long chatId) {
-//        userService.deleteUserChatId(chatId);
-//        return (User) ResponseEntity.status(HttpStatus.OK);
-//    }
+    /**
+     * Обрабатывает DELETE-запрос для удаления пользователя по Телеграм ID
+     *
+     * @param chatId Идентификатор Телеграм пользователя для удаления
+     * @return Подтверждение успешного удаления волонтера
+     */
+    @DeleteMapping("/chatId/{chatId}")
+    @Operation(summary = "Remove user by Telegram ID",
+            description = "Removes a user by Telegram ID from the system",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully removed"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            })
+    public ResponseEntity<Void> deleteVolunteerChatId(@PathVariable Long chatId) {
+        if (userService.findUserByChatId(chatId).isPresent()) {
+            userService.deleteUserChatId(chatId);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 
     @GetMapping("/all")
     @Operation(summary = "Get all users",
