@@ -1,13 +1,13 @@
 databaseChangeLog:
   - include:
-      file: liquibase/scripts/pets-tables.sql
-  - include:
-      file: liquibase/scripts/pet-avatars-tables.sql
+      file: liquibase/scripts/users-tables.sql
   - include:
       file: liquibase/scripts/volunteers-tables.sql
   - include:
       file: liquibase/scripts/shelters-tables.sql
   - include:
-      file: liquibase/scripts/drive-dir-picture.sql
+      file: liquibase/scripts/pets-tables.sql
   - include:
-      file: liquibase/scripts/users-tables.sql
+      file: liquibase/scripts/pet-avatars-tables.sql
+  - include:
+      file: liquibase/scripts/drive-dir-picture.sql

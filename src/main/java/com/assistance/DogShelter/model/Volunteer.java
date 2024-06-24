@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
  * Содержит информацию о волонтере, такую как имя и номер телефона.
  */
 @Entity
-@Table(name = "volunteers")
+@Table(name = "volunteers", schema = "public")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,7 +24,7 @@ public class Volunteer {
     private long id;              // id волонтера
     @Column(name = "chat_id", nullable = false)
     private long chatId;          // id волонтера в Telegram
-    @Column(name = "volunteer_name", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;          // имя волонтера
     @Column(name = "is_busy", nullable = false)
     private boolean isBusy;       //статус волонтёра (занят)
