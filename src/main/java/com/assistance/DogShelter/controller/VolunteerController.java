@@ -3,6 +3,8 @@ package com.assistance.DogShelter.controller;
 import com.assistance.DogShelter.model.User;
 import com.assistance.DogShelter.model.Volunteer;
 import com.assistance.DogShelter.service.VolunteerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +39,12 @@ public class VolunteerController {
      * @return волонтер , который был добавлен с помощью сервиса.
      */
     @PostMapping("/add")
+    @Operation(summary = "Add volunteer",
+            description = "Adds a new volunteer to the system",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Successfully created"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request")
+            })
     public Volunteer addVolunteer(@RequestBody Volunteer volunteer) {
         Volunteer addVolunteer = volunteerService.addVolunteer(volunteer);
         return ResponseEntity.status(HttpStatus.CREATED).body(addVolunteer).getBody();
@@ -49,13 +57,17 @@ public class VolunteerController {
      * @return волонтер с указанным идентификатором, если найден, в противном случае возвращает 404 ошибку.
      */
     @GetMapping("{id}")
-    public Volunteer findVolunteerById(@PathVariable Long id) {
+    @Operation(summary = "Search volunteer",
+            description = "Searches for a volunteer in the system",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully removed"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "Volunteer not found")
+            })
+    public ResponseEntity<Volunteer> findVolunteerById(@PathVariable Long id) {
         Optional<Volunteer> volunteer = volunteerService.findVolunteerById(id);
-
-        if (volunteer.isEmpty()) {
-            return (Volunteer) ResponseEntity.status(HttpStatus.NOT_FOUND).build().getBody();
-        }
-        return ResponseEntity.status(HttpStatus.FOUND).body(findVolunteerById(id)).getBody();
+        return volunteer.map(value -> ResponseEntity.status(HttpStatus.OK).body(value))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     /**
@@ -66,13 +78,20 @@ public class VolunteerController {
      * @return Обновленный волонтер, если редактирование выполнено успешно, в противном случае возвращает 404 ошибку.
      */
     @PutMapping("{id}")
-    public Volunteer editVolunteer(@RequestBody Volunteer volunteer, @PathVariable Long id) {
-        Volunteer foundVolunteer = volunteerService.editVolunteer(volunteer);
-
-        if (foundVolunteer == null) {
-            return (Volunteer) ResponseEntity.status(HttpStatus.NOT_FOUND).build().getBody();
+    @Operation(summary = "Update volunteer",
+            description = "Updates a volunteer's information",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully removed"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "Volunteer not found")
+            })
+    public ResponseEntity<Volunteer> editVolunteer(@RequestBody Volunteer volunteer, @PathVariable Long id) {
+        Optional<Volunteer> foundVolunteer = volunteerService.findVolunteerById(id);
+        if (foundVolunteer.isPresent()) {
+            Volunteer updatedVolunteer = volunteerService.editVolunteer(volunteer);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedVolunteer);
         }
-        return ResponseEntity.status(HttpStatus.FOUND).body(findVolunteerById(id)).getBody();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     /**
@@ -83,9 +102,20 @@ public class VolunteerController {
      * @return Подтверждение успешного изменения статуса занятости волонтера
      */
     @PostMapping("{userId}")
-    public Volunteer setVolunteerBusy(@PathVariable Long userId, Boolean busy) {
-        Volunteer setVolunteer = volunteerService.keepVolunteerBusy(userId, busy);
-        return ResponseEntity.status(HttpStatus.FOUND).body(setVolunteer).getBody();
+    @Operation(summary = "Set volunteer",
+            description = "Set status for a volunteer as busy",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully updated"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "Volunteer not found")
+            })
+    public ResponseEntity<Volunteer> setVolunteerBusy(@PathVariable Long userId, @RequestParam Boolean busy) {
+        Optional<Volunteer> volunteer = volunteerService.findVolunteerById(userId);
+        if (volunteer.isPresent()) {
+            Volunteer updatedVolunteer = volunteerService.keepVolunteerBusy(userId, busy);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedVolunteer);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     /**
@@ -95,9 +125,19 @@ public class VolunteerController {
      * @return Подтверждение успешного удаления волонтера
      */
     @DeleteMapping("{id}")
-    public Volunteer deleteVolunteer(@PathVariable Long id) {
-        volunteerService.deleteVolunteer(id);
-        return (Volunteer) ResponseEntity.status(HttpStatus.OK);
+    @Operation(summary = "Remove volunteer",
+            description = "Removes a volunteer from the system",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully updated"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "Volunteer not found")
+            })
+    public ResponseEntity<Void> deleteVolunteer(@PathVariable Long id) {
+        if (volunteerService.findVolunteerById(id).isPresent()) {
+            volunteerService.deleteVolunteer(id);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
 //    /**
@@ -113,6 +153,12 @@ public class VolunteerController {
 //    }
 
     @GetMapping("/all")
+    @Operation(summary = "Get all volunteers",
+            description = "Retrieves a list of all volunteers in the system",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request")
+            })
     public ResponseEntity<Collection<Volunteer>> getAllVolunteers() {
         return ResponseEntity.ok(volunteerService.getAllVolunteers());
     }

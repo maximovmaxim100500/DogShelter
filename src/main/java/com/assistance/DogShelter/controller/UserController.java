@@ -2,6 +2,8 @@ package com.assistance.DogShelter.controller;
 
 import com.assistance.DogShelter.model.User;
 import com.assistance.DogShelter.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,12 @@ public class UserController {
      * @return Пользователь, который был добавлен с помощью сервиса.
      */
     @PostMapping("/add")
+    @Operation(summary = "Add user",
+            description = "Adds a new user to the system",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Successfully created"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request")
+            })
     public User addUser(@RequestBody User user) {
         User addUser = userService.addUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(addUser).getBody();
@@ -47,12 +55,17 @@ public class UserController {
      * @return Пользователь с указанным идентификатором, если найден, в противном случае возвращает 404 ошибку.
      */
     @GetMapping("{id}")
-    public User findUserById(@PathVariable Long id) {
+    @Operation(summary = "Search user",
+            description = "Searches for a user in the system",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            })
+    public ResponseEntity<User> findUserById(@PathVariable Long id) {
         Optional<User> user = userService.findUserById(id);
-        if (user.isEmpty()) {
-            return (User) ResponseEntity.status(HttpStatus.NOT_FOUND).build().getBody();
-        }
-        return ResponseEntity.status(HttpStatus.FOUND).body(findUserById(id)).getBody();
+        return user.map(value -> ResponseEntity.status(HttpStatus.OK).body(value))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     /**
@@ -63,12 +76,20 @@ public class UserController {
      * @return Обновленный пользователь, если редактирование выполнено успешно, в противном случаи возвращает 404 ошибку.
      */
     @PutMapping("{id}")
-    public User editUser(@RequestBody User user, @PathVariable Long id) {
-        User foundUser = userService.editUser(user);
-        if (foundUser == null) {
-            return (User) ResponseEntity.status(HttpStatus.NOT_FOUND).build().getBody();
+    @Operation(summary = "Update user",
+            description = "Updates a user's information",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully updated"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            })
+    public ResponseEntity<User> editUser(@RequestBody User user, @PathVariable Long id) {
+        Optional<User> foundUser = userService.findUserById(id);
+        if (foundUser.isPresent()) {
+            User updatedUser = userService.editUser(user);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
         }
-        return ResponseEntity.status(HttpStatus.FOUND).body(findUserById(id)).getBody();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     /**
@@ -78,9 +99,19 @@ public class UserController {
      * @return Подтверждение успешного удаления пользователя.
      */
     @DeleteMapping("{id}")
-    public User deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return (User) ResponseEntity.status(HttpStatus.OK);
+    @Operation(summary = "Remove user",
+            description = "Removes a user from the system",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully removed"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            })
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        if (userService.findUserById(id).isPresent()) {
+            userService.deleteUser(id);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
 //    /**
@@ -96,6 +127,12 @@ public class UserController {
 //    }
 
     @GetMapping("/all")
+    @Operation(summary = "Get all users",
+            description = "Retrieves a list of all users in the system",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request")
+            })
     public ResponseEntity<Collection<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Optional;
 
-@Component
+@Service
 @Slf4j
 public class UserService {
     @Autowired
