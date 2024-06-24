@@ -40,7 +40,7 @@ public class UserController {
     @Operation(summary = "Add user",
             description = "Adds a new user to the system",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully created"),
+                    @ApiResponse(responseCode = "201", description = "Successfully created"),
                     @ApiResponse(responseCode = "400", description = "Invalid request")
             })
     public User addUser(@RequestBody User user) {
@@ -62,12 +62,10 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "Invalid request"),
                     @ApiResponse(responseCode = "404", description = "User not found")
             })
-    public User findUserById(@PathVariable Long id) {
+    public ResponseEntity<User> findUserById(@PathVariable Long id) {
         Optional<User> user = userService.findUserById(id);
-        if (user.isEmpty()) {
-            return (User) ResponseEntity.status(HttpStatus.NOT_FOUND).build().getBody();
-        }
-        return ResponseEntity.status(HttpStatus.FOUND).body(findUserById(id)).getBody();
+        return user.map(value -> ResponseEntity.status(HttpStatus.OK).body(value))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     /**
@@ -82,14 +80,16 @@ public class UserController {
             description = "Updates a user's information",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Successfully updated"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request")
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
             })
-    public User editUser(@RequestBody User user, @PathVariable Long id) {
-        User foundUser = userService.editUser(user);
-        if (foundUser == null) {
-            return (User) ResponseEntity.status(HttpStatus.NOT_FOUND).build().getBody();
+    public ResponseEntity<User> editUser(@RequestBody User user, @PathVariable Long id) {
+        Optional<User> foundUser = userService.findUserById(id);
+        if (foundUser.isPresent()) {
+            User updatedUser = userService.editUser(user);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
         }
-        return ResponseEntity.status(HttpStatus.FOUND).body(findUserById(id)).getBody();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     /**
@@ -103,11 +103,15 @@ public class UserController {
             description = "Removes a user from the system",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Successfully removed"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request")
+                    @ApiResponse(responseCode = "400", description = "Invalid request"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
             })
-    public User deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return (User) ResponseEntity.status(HttpStatus.OK);
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        if (userService.findUserById(id).isPresent()) {
+            userService.deleteUser(id);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
 //    /**
