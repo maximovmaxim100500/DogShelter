@@ -12,38 +12,42 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * Основной класс Telegram бота для приюта для собак.
- * Обрабатывает команды и взаимодействует с пользователями через Telegram.
- */
 @Component
 @Slf4j
 public class TelegramBot extends TelegramLongPollingBot {
+
     private final BotConfig botConfig;
+    private final CallBackQueryHandler callBackQueryHandler;
+    private final TextMessageHandler textMessageHandler;
 
     /**
-     * Конструктор класса TelegramBot.
-     * @param botConfig Конфигурация бота.
+     * Конструктор для TelegramBot.
+     *
+     * @param botConfig           Конфигурация бота.
+     * @param callBackQueryHandler Обработчик обратных вызовов.
+     * @param textMessageHandler  Обработчик текстовых сообщений.
      */
-    public TelegramBot(@Autowired BotConfig botConfig) {
+    @Autowired
+    public TelegramBot(BotConfig botConfig, CallBackQueryHandler callBackQueryHandler, TextMessageHandler textMessageHandler) {
         this.botConfig = botConfig;
-        // Устанавливаем список команд для бота при его создании
+        this.callBackQueryHandler = callBackQueryHandler;
+        this.textMessageHandler = textMessageHandler;
+
+        // Инициализация списка команд для бота
         List<BotCommand> listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/start", "начать"));
         listOfCommands.add(new BotCommand("/help", "помощь"));
         try {
+            // Установка команд для бота
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
-            log.error("Error setting bot's commands list", e.getMessage());
+            log.error("Ошибка при установке списка команд бота", e);
         }
     }
 
@@ -57,248 +61,166 @@ public class TelegramBot extends TelegramLongPollingBot {
         return botConfig.getToken();
     }
 
+    /**
+     * Обработка полученного обновления.
+     *
+     * @param update Объект обновления.
+     */
     @Override
     public void onUpdateReceived(Update update) {
-        // Проверяем, получено ли сообщение и содержит ли оно текст
         if (update.hasMessage() && update.getMessage().hasText()) {
-            // Получаем текст сообщения и id чата
-            String messageText = update.getMessage().getText();
-            long chatId = update.getMessage().getChatId();
-
-            // Обрабатываем сообщение в зависимости от его содержания
-            switch (messageText) {
-                case "/start":
-                    startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
-                    choosingShelter(chatId);
-                    break;
-                case "/help":
-                    sendMessage(chatId, "Нажмите /start чтобы начать");
-                    break;
-                default:
-                    sendMessage(chatId, "Sorry, required command is not recognized");
-            }
-        } else if (update.hasCallbackQuery()) { //Проверяем данные, отправленные боту от всплывающих кнопок
-            String callbackData = update.getCallbackQuery().getData(); //те самые данные, которые бот получит от кнопки
-            long messageId = update.getCallbackQuery().getMessage().getMessageId();
-            long chatId = update.getCallbackQuery().getMessage().getChatId();
-
-            switch (callbackData) {
-                case "Приют_1" -> {
-                    String text = callbackData + ". Выберете действие:";
-                    showShelterInfo(chatId, messageId, text);
-                }
-                case "Приют_2" -> {
-                    String text = "Приют Pick up the dog. Выберете действие:";
-                    showShelterInfo(chatId, messageId, text);
-                }
-                case "ShelterInfo" -> sendMessage(chatId, "Информация о приюте");
-                case "TakeTheDog" -> sendMessage(chatId, "Чтобы взять собаку нужно...");
-                case "DogReport" -> sendMessage(chatId, "Вот ваш отчет");
-                case "CallVolunteer" -> sendMessage(chatId, "Зовем волонтера");
-                case "ComeBack1" -> choosingShelter(chatId);
-            }
+            // Обработка текстового сообщения
+            textMessageHandler.handleTextMessage(update, this);
+        } else if (update.hasCallbackQuery()) {
+            // Обработка обратного вызова
+            callBackQueryHandler.handleCallbackQuery(update, this);
         }
     }
 
     /**
-     * Отправляет меню для выбранного приюта.
-     * @param chatId Идентификатор чата.
-     * @param messageId Идентификатор сообщения.
-     * @param text Текст сообщения.
+     * Отправка текстового сообщения пользователю.
+     *
+     * @param chatId     Идентификатор чата.
+     * @param textToSend Текст для отправки.
      */
-    private void showShelterInfo(long chatId, long messageId, String text) {
-        EditMessageText message = new EditMessageText();    // Специальный класс для замены последнего сообщения
+    public void sendMessage(long chatId, String textToSend) {
+        SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText(text);
-        message.setMessageId((int)messageId);
-
-        // Создаем кнопки под сообщение
-        InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup(); // Инжектим класс всплывающих под сообщением кнопок
-        List<InlineKeyboardButton> rowInLine1 = new ArrayList<>(); // Список 1 ряда кнопок
-        List<InlineKeyboardButton> rowInLine2 = new ArrayList<>(); // Список 2 ряда кнопок
-        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>(); // Список списков наших кнопок
-
-        var buttonOurPets = new InlineKeyboardButton();
-        buttonOurPets.setText("Наши питомцы");
-        buttonOurPets.setCallbackData("OurPets");
-
-        var buttonSchedule = new InlineKeyboardButton();
-        buttonSchedule.setText("Расписание");
-        buttonSchedule.setCallbackData("Schedule");
-
-        var buttonDirections = new InlineKeyboardButton();
-        buttonDirections.setText("Схема проезда");
-        buttonDirections.setCallbackData("Directions");
-
-        var buttonContacts = new InlineKeyboardButton();
-        buttonContacts.setText("Контакты");
-        buttonContacts.setCallbackData("Contacts");
-
-        var buttonQuestions = new InlineKeyboardButton();
-        buttonQuestions.setText("Остались вопросы");
-        buttonQuestions.setCallbackData("Questions");
-
-        rowInLine1.add(buttonOurPets);
-        rowInLine1.add(buttonSchedule);
-        rowInLine2.add(buttonDirections);
-        rowInLine2.add(buttonContacts);
-        rowInLine2.add(buttonQuestions);
-        rowsInLine.add(rowInLine1);
-        rowsInLine.add(rowInLine2);
-
-        markupInLine.setKeyboard(rowsInLine);   // Этот метод устанавливает наш список кнопок
-        message.setReplyMarkup(markupInLine);   // Этот метод прикрепляет нашу клавиатуру к сообщению, которое будет
-        // Отправлено пользователю
+        message.setText(textToSend);
 
         try {
+            // Выполнение отправки сообщения
             execute(message);
+            log.info("Отправлено сообщение: \"" + textToSend + "\" в чат: " + chatId);
         } catch (TelegramApiException e) {
-            log.error("Error occurred while sending message: " + e.getMessage(), e);
+            log.error("Ошибка при отправке сообщения: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Обрабатывает команду /start.
-     * @param chatId Идентификатор чата.
-     * @param name Имя пользователя.
-     */
-    public void startCommandReceived(long chatId, String name) {
-        String answer = "Hi, " + name + "! Nice to meet you!";
-        log.info("Replied to " + name);
-        sendMessage(chatId, answer);
-    }
-
-    /**
-     * Отправляет сообщение в чат.
-     * @param chatId Идентификатор чата.
-     * @param textToSend Текст сообщения.
-     */
-    private void sendMessage(long chatId, String textToSend) {
-        SendMessage sendMessage = new SendMessage(); //специальный класс для отправки сообщений
-        sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText(textToSend);
-
-        creatingKeyboard(sendMessage);//Создаем кнопки клавиатуры
-
-        try {
-            execute(sendMessage);
-            log.info("Sent message: \"" + textToSend + "\" to chatId: " + chatId);
-        } catch (TelegramApiException e) {
-            log.error("Error occurred while sending message: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Создает клавиатуру для отправляемого сообщения.
-     * @param sendMessage Сообщение, к которому прикрепляется клавиатура.
-     */
-    private void creatingKeyboard(SendMessage sendMessage) {//Создаем кнопки клавиатуры
-        //Как я понял, кнопки клавиатуры создаются один раз и будут висеть внизу всегда, пока мы их не заменим на другие
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup(); // инжектим специальный класс разметки клавиатуры
-        List<KeyboardRow> keyboardRows = new ArrayList<>(); // Список рядов наших кнопок.
-        KeyboardRow row = new KeyboardRow(); //первый ряд кнопок
-        row.add("/start"); //порядок создания имеет значение
-        row.add("/help");
-        keyboardRows.add(row);
-        keyboardMarkup.setKeyboard(keyboardRows); //этот метод устанавливает наш список кнопок в качестве клавиатуры
-        sendMessage.setReplyMarkup(keyboardMarkup); //этот метод прикрепляет нашу клавиатуру к сообщению, которое будет
-        //отправлено пользователю
-    }
-
-    /**
-     * Отправляет сообщение пользователю для выбора приюта.
-     * @param chatId Идентификатор чата.
-     */
-    private void choosingShelter(long chatId) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText("Выберете приют");
-
-        InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup();
-        List<InlineKeyboardButton> rowInLine = new ArrayList<>(); //Список одного ряда кнопок
-        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();//Список списков наших кнопок
-
-        var buttonStrayDogs = new InlineKeyboardButton(); //создаем кнопку
-        buttonStrayDogs.setText("Приют 1"); //текст кнопки
-        buttonStrayDogs.setCallbackData("Приют_1"); //данные, которые кнопка отправляет боту при ее нажатии
-
-        var buttonPickUpTheDog = new InlineKeyboardButton();//создаем кнопку
-        buttonPickUpTheDog.setText("Приют 2");//текст кнопки
-        buttonPickUpTheDog.setCallbackData("Приют_2");//данные, которые кнопка отправляет боту при ее нажатии
-
-        rowInLine.add(buttonStrayDogs); //порядок создания имеет значение
-        rowInLine.add(buttonPickUpTheDog);
-        rowsInLine.add(rowInLine);
-
-        markupInLine.setKeyboard(rowsInLine); //этот метод устанавливает наш список кнопок
-        sendMessage.setReplyMarkup(markupInLine);//этот метод прикрепляет нашу клавиатуру к сообщению, которое будет
-        //отправлено пользователю
-
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            log.error("Error occurred while sending message: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Отправляет меню для выбранного приюта.
-     * @param chatId Идентификатор чата.
+     * Показ информации о приюте.
+     *
+     * @param chatId    Идентификатор чата.
      * @param messageId Идентификатор сообщения.
-     * @param text Текст сообщения.
+     * @param text      Текст для отображения.
      */
-    private void shelterMenu(long chatId, long messageId, String text) {
-        EditMessageText message = new EditMessageText(); //специальный класс для замены последнего сообщения
+    public void showShelterInfo(long chatId, long messageId, String text) {
+        // Создаем объект сообщения для редактирования текста
+        EditMessageText message = new EditMessageText();
         message.setChatId(String.valueOf(chatId));
         message.setText(text);
         message.setMessageId((int) messageId);
-        //Создаем кнопки. Эти кнопки появятся под сообщением
-        InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup(); //инжектим класс всплывающих под сообщением кнопок
-        List<InlineKeyboardButton> rowInLine1 = new ArrayList<>(); //Список первого ряда кнопок
-        List<InlineKeyboardButton> rowInLine2 = new ArrayList<>(); //Список второго ряда кнопок
-        List<InlineKeyboardButton> rowInLine3 = new ArrayList<>(); //Список третьего ряда кнопок
-        List<InlineKeyboardButton> rowInLine4 = new ArrayList<>(); //Список четвертого ряда кнопок
-        List<InlineKeyboardButton> rowInLine5 = new ArrayList<>(); //Список четвертого ряда кнопок
-        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();//Список списков наших кнопок
 
-        var buttonShelterInfo = new InlineKeyboardButton();
-        buttonShelterInfo.setText("Узнать информацию о приюте");
-        buttonShelterInfo.setCallbackData("ShelterInfo");
+        // Создаем объект для разметки инлайн-клавиатуры
+        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline1 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline2 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine3 = new ArrayList<>();
 
-        var buttonTakeTheDog = new InlineKeyboardButton();
-        buttonTakeTheDog.setText("Как взять животное из приюта");
-        buttonTakeTheDog.setCallbackData("TakeTheDog");
+        // Создание кнопок для меню информации о приюте
+        InlineKeyboardButton buttonOurPets = new InlineKeyboardButton();
+        buttonOurPets.setText("Наши питомцы");
+        buttonOurPets.setCallbackData("OurPets");
 
-        var buttonDogReport = new InlineKeyboardButton();
-        buttonDogReport.setText("Прислать отчет о питомце");
-        buttonDogReport.setCallbackData("DogReport");
+        InlineKeyboardButton buttonSchedule = new InlineKeyboardButton();
+        buttonSchedule.setText("Расписание");
+        buttonSchedule.setCallbackData("Schedule");
 
-        var buttonCallVolunteer = new InlineKeyboardButton();
-        buttonCallVolunteer.setText("Позвать волонтера");
-        buttonCallVolunteer.setCallbackData("CallVolunteer");
+        InlineKeyboardButton buttonDirections = new InlineKeyboardButton();
+        buttonDirections.setText("Схема проезда");
+        buttonDirections.setCallbackData("Directions");
 
-        var buttonBack = new InlineKeyboardButton();
-        buttonCallVolunteer.setText("Назад");
-        buttonCallVolunteer.setCallbackData("ComeBack1");
+        InlineKeyboardButton buttonContacts = new InlineKeyboardButton();
+        buttonContacts.setText("Контакты");
+        buttonContacts.setCallbackData("Contacts");
 
-        rowInLine1.add(buttonShelterInfo);
-        rowInLine2.add(buttonTakeTheDog);
-        rowInLine3.add(buttonDogReport);
-        rowInLine4.add(buttonCallVolunteer);
-        rowsInLine.add(rowInLine1);
-        rowsInLine.add(rowInLine2);
-        rowsInLine.add(rowInLine3);
-        rowsInLine.add(rowInLine4);
-        rowsInLine.add(rowInLine5);
+        InlineKeyboardButton buttonQuestions = new InlineKeyboardButton();
+        buttonQuestions.setText("Остались вопросы");
+        buttonQuestions.setCallbackData("Questions");
 
-        markupInLine.setKeyboard(rowsInLine); //этот метод устанавливает наш список кнопок
-        message.setReplyMarkup(markupInLine);//этот метод прикрепляет нашу клавиатуру к сообщению, которое будет
-        //отправлено пользователю
+        // Кнопка "Назад" для возврата в меню выбора приютов
+        InlineKeyboardButton buttonBack = new InlineKeyboardButton();
+        buttonBack.setText("Назад");
+        buttonBack.setCallbackData("ComeBack1");
+
+        // Добавление кнопок в строки
+        rowInline1.add(buttonOurPets);
+        rowInline1.add(buttonSchedule);
+        rowInline2.add(buttonDirections);
+        rowInline2.add(buttonContacts);
+        rowInline2.add(buttonQuestions);
+        rowInLine3.add(buttonBack);
+
+        // Добавление строк в список строк
+        rowsInline.add(rowInline1);
+        rowsInline.add(rowInline2);
+        rowsInline.add(rowInLine3);
+
+        // Установка разметки клавиатуры
+        markupInline.setKeyboard(rowsInline);
+        message.setReplyMarkup(markupInline);
 
         try {
+            // Выполнение отправки сообщения с кнопками
             execute(message);
+            log.info("Отправлено меню информации о приюте в чат: " + chatId);
         } catch (TelegramApiException e) {
-            log.error("Error occurred while sending message: " + e.getMessage(), e);
+            log.error("Ошибка при отправке меню информации о приюте: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Обработка команды /start.
+     *
+     * @param chatId Идентификатор чата.
+     * @param name   Имя пользователя.
+     */
+    public void startCommandReceived(long chatId, String name) {
+        // Формирование приветственного сообщения
+        String greetingMessage = "Привет, " + name + "! Добро пожаловать в наш приют для собак!";
+        sendMessage(chatId, greetingMessage);
+        choosingShelter(chatId);
+    }
+
+    /**
+     * Отображение меню выбора приюта.
+     *
+     * @param chatId Идентификатор чата.
+     */
+    protected void choosingShelter(long chatId) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(chatId));
+        sendMessage.setText("Выберите приют:");
+
+        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+
+        // Создание кнопок для выбора приюта
+        InlineKeyboardButton buttonShelter1 = new InlineKeyboardButton();
+        buttonShelter1.setText("Приют 1");
+        buttonShelter1.setCallbackData("Приют_1");
+
+        InlineKeyboardButton buttonShelter2 = new InlineKeyboardButton();
+        buttonShelter2.setText("Приют 2");
+        buttonShelter2.setCallbackData("Приют_2");
+
+        // Добавление кнопок в строку
+        rowInline.add(buttonShelter1);
+        rowInline.add(buttonShelter2);
+        rowsInline.add(rowInline);
+
+        // Установка разметки клавиатуры
+        markupInline.setKeyboard(rowsInline);
+        sendMessage.setReplyMarkup(markupInline);
+
+        try {
+            // Выполнение отправки сообщения с кнопками
+            execute(sendMessage);
+            log.info("Отправлено меню выбора приюта в чат: " + chatId);
+        } catch (TelegramApiException e) {
+            log.error("Ошибка при отправке меню выбора приюта: " + e.getMessage(), e);
         }
     }
 }
