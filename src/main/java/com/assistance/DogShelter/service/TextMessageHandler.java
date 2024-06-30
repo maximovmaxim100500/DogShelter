@@ -25,12 +25,12 @@ public class TextMessageHandler {
 
             switch (messageText) {
                 case "/start":
-                    bot.sendMessage(chatId, "Добро пожаловать! Используйте команду /register для регистрации в качестве волонтера.");
+                    bot.startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
                     break;
                 case "/help":
                     bot.sendMessage(chatId, "Список доступных команд:\n/start - Начать работу с ботом (меню)\n/registerVolunteer - Регистрация волонтера\n/help - Список команд");
                     break;
-                case "/registerVolunteer":
+                case "/register_volunteer":
                     volunteerRegistrationService.registerVolunteer(update);
                     break;
                 default:
