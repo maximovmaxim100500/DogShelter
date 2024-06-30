@@ -133,6 +133,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    public void startCommandReceived(long chatId, String name) {
+        // Формирование приветственного сообщения
+        String greetingMessage = "Привет, " + name + "! Добро пожаловать в наш приют для собак!";
+        sendMessage(chatId, greetingMessage);
+        choosingShelter(chatId);
+    }
+
     public void choosingShelter(long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
