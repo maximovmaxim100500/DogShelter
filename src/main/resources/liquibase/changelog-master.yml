@@ -4,6 +4,8 @@ databaseChangeLog:
   - include:
       file: liquibase/scripts/pet-avatars-tables.sql
   - include:
+      file: liquibase/scripts/reports-tables.sql
+  - include:
       file: liquibase/scripts/users-tables.sql
   - include:
       file: liquibase/scripts/volunteers-tables.sql
@@ -11,3 +13,5 @@ databaseChangeLog:
       file: liquibase/scripts/shelters-tables.sql
   - include:
       file: liquibase/scripts/drive-dir-picture.sql
+  - include:
+      file: liquibase/scripts/photos-reports-tables.sql
