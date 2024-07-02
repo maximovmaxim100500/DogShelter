@@ -8,3 +8,9 @@ CREATE TABLE reports (
     text TEXT NOT NULL,             -- Текст отчета
     date DATE NOT NULL              -- Дата отчета
 );
+
+-- changeset mmaksimov:2
+
+-- Создание колонки check
+ALTER TABLE reports
+    ADD COLUMN checkReport BOOLEAN;       --Статус отчета

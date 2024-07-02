@@ -28,6 +28,9 @@ public class Report {
     @Column(nullable = false)       // дата отчета
     private LocalDate date;
 
+    @Column(nullable = false)       // статус отчета
+    private Boolean checkReport;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;              //привязываем отчет к пользователю(User)
