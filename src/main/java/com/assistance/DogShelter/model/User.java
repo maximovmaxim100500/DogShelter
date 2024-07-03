@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,4 +41,7 @@ public class User {
     @JsonIgnore
     private Set<Pet> pets;        // связать с классом Pet
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private List<Report> reports; //связать с классом Report
 }
