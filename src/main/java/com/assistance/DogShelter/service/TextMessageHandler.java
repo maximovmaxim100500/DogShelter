@@ -28,7 +28,7 @@ public class TextMessageHandler {
                     bot.startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
                     break;
                 case "/help":
-                    bot.sendMessage(chatId, "Список доступных команд:\n/start - Начать работу с ботом (меню)\n/registerVolunteer - Регистрация волонтера\n/help - Список команд");
+                    bot.sendMessage(chatId, "Список доступных команд:\n/start - Начать работу с ботом (меню)\n/register_volunteer - Регистрация волонтера\n/help - Список команд");
                     break;
                 case "/register_volunteer":
                     volunteerRegistrationService.registerVolunteer(update);
