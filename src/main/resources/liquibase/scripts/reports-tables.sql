@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset mmaksimov:1
+-- changeset mmaksimov:${changeset.id.sequence}
 
 -- Создание таблицы для хранения информации об отчетах
 CREATE TABLE reports (
@@ -9,7 +9,7 @@ CREATE TABLE reports (
     date DATE NOT NULL              -- Дата отчета
 );
 
--- changeset mmaksimov:2
+-- changeset mmaksimov:${changeset.id.sequence}
 
 -- Создание колонки check
 ALTER TABLE reports

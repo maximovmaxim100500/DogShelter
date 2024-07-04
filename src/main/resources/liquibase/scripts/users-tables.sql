@@ -1,6 +1,10 @@
 -- liquibase formatted sql
 
--- changeset dkhan:1
+-- changeset dkhan:${changeset.id.sequence}
+
+-- preConditions
+-- precondition onFail: MARK_RAN
+-- tableExists tableName: pets
 
 -- Создание таблицы для хранения информации о пользователях
 CREATE TABLE users (
@@ -14,7 +18,11 @@ CREATE TABLE users (
         REFERENCES pets (id)
 );
 
--- changeset mmaksimov:2
+-- changeset mmaksimov:${changeset.id.sequence}
+
+-- preConditions
+-- precondition onFail: MARK_RAN
+-- tableExists tableName: reports
 
 -- Создание колонки для связи между пользователями и их отчетами
 ALTER TABLE users

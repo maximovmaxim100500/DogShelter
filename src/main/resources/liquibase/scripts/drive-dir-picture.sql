@@ -1,17 +1,23 @@
 -- liquibase formatted sql
 
--- changeset mmaximov:2
+-- changeset mmaksimov:${changeset.id.sequence}
 
--- Создание таблицы для хранения схем проезда к приютам
-CREATE TABLE drive_dir_picture (
-    id BIGSERIAL PRIMARY KEY,       -- Уникальный идентификатор схемы
-    file_path VARCHAR(255) NOT NULL, -- Путь к файлу схемы
-    file_size BIGINT NOT NULL,      -- Размер файла схемы
-    media_type VARCHAR(255) NOT NULL, -- Тип медиа файла схемы
-    data BYTEA NOT NULL,            -- Данные файла схемы
-    shelter_id BIGINT NOT NULL,         -- Идентификатор приюта, ссылка на таблицу shelters
-    CONSTRAINT fk_shelters
-        FOREIGN KEY (shelter_id)
-        REFERENCES shelters (id)
-        ON DELETE CASCADE
+-- Создание таблицы для хранения информации о директории
+CREATE TABLE drive_directory (
+    id BIGSERIAL PRIMARY KEY,       -- Уникальный идентификатор директории
+    name VARCHAR(255) NOT NULL,     -- Название директории
+    path VARCHAR(255) NOT NULL      -- Путь к директории
 );
+
+-- changeset dsiliukov:${changeset.id.sequence}
+
+-- preConditions
+-- precondition onFail: MARK_RAN
+-- tableExists tableName: shelters
+
+-- Добавление столбца shelter_id для связи с таблицей shelters
+ALTER TABLE drive_directory
+    ADD COLUMN shelter_id BIGINT,
+    ADD CONSTRAINT fk_shelter_id
+        FOREIGN KEY (shelter_id)
+        REFERENCES shelters (id);

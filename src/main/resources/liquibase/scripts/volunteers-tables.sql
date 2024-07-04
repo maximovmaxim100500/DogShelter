@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset dkhan:1
+-- changeset dkhan:${changeset.id.sequence}
 
 -- Создание таблицы для хранения информации о волонтерах
 CREATE TABLE volunteers (

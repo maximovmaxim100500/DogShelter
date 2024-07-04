@@ -35,7 +35,12 @@ public class Pet {
     private String food;        // предпочитаемая еда питомца
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     @JsonIgnoreProperties("pets")
     private User user;          // связать с классом User
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shelter_id", nullable = false)
+    @JsonIgnoreProperties("pets")
+    private Shelter shelter;    // связать с классом Shelter
 }
