@@ -37,8 +37,8 @@ public class User {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;   // номер телефона пользователя
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Pet> pets;        // связать с классом Pet
 
     @JsonIgnore
