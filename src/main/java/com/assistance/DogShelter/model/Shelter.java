@@ -1,6 +1,5 @@
 package com.assistance.DogShelter.model;
 
-import com.assistance.DogShelter.enums.Food;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,9 +26,7 @@ public class Shelter {
     private String name;
     @Column(nullable = false)
     private String address;
-    @Column(nullable = true)
-    private long volunteerId;
     @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("shelter")
+    @JsonIgnoreProperties("shelters")
     private Set<Pet> pets;      // связать с классом Pet
 }

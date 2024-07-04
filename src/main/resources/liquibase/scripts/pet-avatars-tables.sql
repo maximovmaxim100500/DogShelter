@@ -7,7 +7,7 @@
 -- tableExists tableName: pets
 
 -- Создание таблицы для хранения аватаров питомцев
-CREATE TABLE pet_avatars (
+CREATE TABLE IF NOT EXISTS  pet_avatars (
     id BIGSERIAL PRIMARY KEY,           -- Уникальный идентификатор аватара
     file_path VARCHAR(255) NOT NULL,    -- Путь к файлу аватара
     file_size BIGINT NOT NULL,          -- Размер файла аватара
@@ -19,3 +19,9 @@ CREATE TABLE pet_avatars (
         REFERENCES pets (id)
         ON DELETE CASCADE
 );
+
+-- changeset dsiliukov:${changeset.id.sequence}
+
+ALTER TABLE pet_avatars
+    ALTER COLUMN data TYPE oid
+    USING lo_from_bytea(0, data); -- Используем функцию lo_from_bytea для преобразования bytea в oid

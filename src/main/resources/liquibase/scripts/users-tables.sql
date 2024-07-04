@@ -7,7 +7,7 @@
 -- tableExists tableName: pets
 
 -- Создание таблицы для хранения информации о пользователях
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,                 -- Уникальный идентификатор пользователя
     chat_id BIGINT UNIQUE NOT NULL,           -- Идентификатор чата в Telegram (обязательное поле, уникальное)
     name VARCHAR(255) NOT NULL,               -- Имя пользователя (обязательное поле)

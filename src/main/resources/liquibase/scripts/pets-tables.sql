@@ -3,7 +3,7 @@
 -- changeset dsiliukov:${changeset.id.sequence}
 
 -- Создание таблицы для хранения информации о питомцах
-CREATE TABLE pets (
+CREATE TABLE IF NOT EXISTS pets (
     id BIGSERIAL PRIMARY KEY,           -- Уникальный идентификатор питомца
     name VARCHAR(255) NOT NULL,         -- Имя питомца
     breed VARCHAR(255) NOT NULL,        -- Порода питомца

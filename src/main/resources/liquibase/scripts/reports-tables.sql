@@ -3,7 +3,7 @@
 -- changeset mmaksimov:${changeset.id.sequence}
 
 -- Создание таблицы для хранения информации об отчетах
-CREATE TABLE reports (
+CREATE TABLE IF NOT EXISTS reports (
     id BIGSERIAL PRIMARY KEY,       -- Уникальный идентификатор отчета
     text TEXT NOT NULL,             -- Текст отчета
     date DATE NOT NULL              -- Дата отчета
@@ -13,4 +13,4 @@ CREATE TABLE reports (
 
 -- Создание колонки check
 ALTER TABLE reports
-    ADD COLUMN checkReport BOOLEAN;       --Статус отчета
+    ADD COLUMN check_report BOOLEAN;       --Статус отчета
