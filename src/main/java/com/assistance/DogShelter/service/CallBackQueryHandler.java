@@ -27,35 +27,40 @@ public class CallBackQueryHandler {
         TelegramBot bot = applicationContext.getBean(TelegramBot.class);
 
         try {
-            switch (callbackData) {
-                case "Приют_1":
-                    String text1 = "Приют1. Выберите действие:";
-                    bot.showShelterInfo(chatId, messageId, text1);
-                    break;
-                case "Приют_2":
-                    String text2 = "Приют2. Выберите действие:";
-                    bot.showShelterInfo(chatId, messageId, text2);
-                    break;
-                case "ShelterInfo":
-                    bot.sendMessage(chatId, "Информация о приюте");
-                    break;
-                case "TakeTheDog":
-                    bot.sendMessage(chatId, "Чтобы взять собаку нужно...");
-                    break;
-                case "DogReport":
-                    bot.sendMessage(chatId, "Вот ваш отчет");
-                    break;
-                case "CallVolunteer":
-                    bot.sendMessage(chatId, "Зовем волонтера");
-                    break;
-                case "RegisterVolunteer":
-                    textMessageHandler.handleTextMessage(update);
-                    break;
-                case "ComeBack1":
-                    bot.choosingShelter(chatId);
-                    break;
-                default:
-                    log.warn("Unknown callback data received: " + callbackData);
+            if (callbackData.startsWith("OurPets_")) {
+                long shelterId = Long.parseLong(callbackData.split("_")[1]);
+                bot.showPets(chatId, shelterId);
+            } else {
+                switch (callbackData) {
+                    case "Приют_1":
+                        String text1 = "Приют1. Выберите действие:";
+                        bot.showShelterInfo(chatId, messageId, text1, 1L);
+                        break;
+                    case "Приют_2":
+                        String text2 = "Приют2. Выберите действие:";
+                        bot.showShelterInfo(chatId, messageId, text2, 2L);
+                        break;
+                    case "ShelterInfo":
+                        bot.sendMessage(chatId, "Информация о приюте");
+                        break;
+                    case "TakeTheDog":
+                        bot.sendMessage(chatId, "Чтобы взять собаку нужно...");
+                        break;
+                    case "DogReport":
+                        bot.sendMessage(chatId, "Вот ваш отчет");
+                        break;
+                    case "CallVolunteer":
+                        bot.sendMessage(chatId, "Зовем волонтера");
+                        break;
+                    case "RegisterVolunteer":
+                        textMessageHandler.handleTextMessage(update);
+                        break;
+                    case "ComeBack1":
+                        bot.choosingShelter(chatId);
+                        break;
+                    default:
+                        log.warn("Unknown callback data received: " + callbackData);
+                }
             }
         } catch (Exception e) {
             log.error("Error while handling callback query: " + callbackData, e);

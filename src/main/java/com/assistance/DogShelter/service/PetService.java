@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -67,4 +68,14 @@ public class PetService {
     public Collection<Pet> getAllPets() {
         return petRepository.findAll();
     }
+    /**
+     * Возвращает список питомцев по идентификатору приюта.
+     *
+     * @param shelterId Идентификатор приюта.
+     * @return Список питомцев приюта.
+     */
+    public Collection<Pet> getPetsByShelterId(Long shelterId) {
+        return petRepository.findByShelterId(shelterId);
+    }
 }
+
