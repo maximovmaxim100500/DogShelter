@@ -2,6 +2,7 @@ package com.assistance.DogShelter.service;
 
 import com.assistance.DogShelter.config.BotConfig;
 import com.assistance.DogShelter.model.Pet;
+import com.assistance.DogShelter.model.Shelter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,13 +27,15 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final CallBackQueryHandler callBackQueryHandler;
     private final TextMessageHandler textMessageHandler;
     private final PetService petService;
+    private final ShelterService shelterService;
 
     @Autowired
-    public TelegramBot(BotConfig botConfig, CallBackQueryHandler callBackQueryHandler, TextMessageHandler textMessageHandler, PetService petService) {
+    public TelegramBot(BotConfig botConfig, CallBackQueryHandler callBackQueryHandler, TextMessageHandler textMessageHandler, PetService petService, ShelterService shelterService) {
         this.botConfig = botConfig;
         this.callBackQueryHandler = callBackQueryHandler;
         this.textMessageHandler = textMessageHandler;
         this.petService = petService;
+        this.shelterService = shelterService;
 
         // Инициализация списка команд для бота
         List<BotCommand> listOfCommands = new ArrayList<>();
@@ -102,7 +105,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         InlineKeyboardButton buttonDirections = new InlineKeyboardButton();
         buttonDirections.setText("Схема проезда");
-        buttonDirections.setCallbackData("Directions");
+        buttonDirections.setCallbackData("Directions_" + shelterId);
 
         InlineKeyboardButton buttonContacts = new InlineKeyboardButton();
         buttonContacts.setText("Контакты");
@@ -150,7 +153,17 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         sendMessage(chatId, petsInfo.toString());
     }
-
+    public void showDirection(long chatId, long shelterId) {
+        // Логика получения адреса из базы данных по shelterId и отправка сообщений в Telegram
+        Optional<Shelter> shelter = shelterService.findShelterById(shelterId);
+        if (shelter.isPresent()) {
+            StringBuilder shelterDirection = new StringBuilder("Адрес приюта:\n");
+            shelterDirection.append(shelter.get().getAddress());
+            sendMessage(chatId, shelterDirection.toString());
+        } else {
+            sendMessage(chatId, "К сожалению, не удалось найти приют с указанным идентификатором.");
+        }
+    }
 
     public void startCommandReceived(long chatId, String name) {
         // Формирование приветственного сообщения

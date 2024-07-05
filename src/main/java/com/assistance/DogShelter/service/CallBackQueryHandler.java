@@ -25,11 +25,15 @@ public class CallBackQueryHandler {
         long messageId = update.getCallbackQuery().getMessage().getMessageId();
         long chatId = update.getCallbackQuery().getMessage().getChatId();
         TelegramBot bot = applicationContext.getBean(TelegramBot.class);
+        Long shelterId = null; // Объявляем shelterId для использования внутри метода
 
         try {
             if (callbackData.startsWith("OurPets_")) {
-                long shelterId = Long.parseLong(callbackData.split("_")[1]);
+                shelterId = Long.parseLong(callbackData.split("_")[1]);
                 bot.showPets(chatId, shelterId);
+            } else if (callbackData.startsWith("Directions_")) {
+                shelterId = Long.parseLong(callbackData.split("_")[1]);
+                bot.showDirection(chatId, shelterId);
             } else {
                 switch (callbackData) {
                     case "Приют_1":

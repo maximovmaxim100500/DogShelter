@@ -4,10 +4,14 @@ import com.assistance.DogShelter.model.DriveDirPicture;
 import com.assistance.DogShelter.service.DriveDirPictureService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -15,31 +19,23 @@ import java.util.Optional;
  * Включает основные CRUD-запросы.
  */
 @RestController
-@RequestMapping("/driveDirPictures")
+@RequestMapping("/api/pictures")
+@Tag(name = "DriveDirPicture", description = "API для работы с изображениями")
 public class DriveDirPictureController {
 
     private final DriveDirPictureService driveDirPictureService;
 
+    @Autowired
     public DriveDirPictureController(DriveDirPictureService driveDirPictureService) {
         this.driveDirPictureService = driveDirPictureService;
     }
 
-    /**
-     * Обрабатывает POST-запрос для добавления нового изображения в хранилище.
-     *
-     * @param driveDirPicture Переданное изображение в теле запроса.
-     * @return Изображение, которое было добавлено с помощью сервиса.
-     */
-    @PostMapping("/add")
-    @Operation(summary = "Add drive directory picture",
-            description = "Adds a new drive directory picture to the system",
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Successfully created"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request")
-            })
-    public ResponseEntity<DriveDirPicture> addDriveDirPicture(@RequestBody DriveDirPicture driveDirPicture) {
-        DriveDirPicture addedDriveDirPicture = driveDirPictureService.addDriveDirPicture(driveDirPicture);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedDriveDirPicture);
+    @PostMapping("/upload")
+    @Operation(summary = "Загрузка изображения")
+    public ResponseEntity<DriveDirPicture> uploadPicture(@RequestParam("file") MultipartFile file,
+                                                         @RequestParam("shelterId") Long shelterId) throws IOException {
+        DriveDirPicture driveDirPicture = driveDirPictureService.uploadPicture(file, shelterId);
+        return new ResponseEntity<>(driveDirPicture, HttpStatus.CREATED);
     }
 
     /**
