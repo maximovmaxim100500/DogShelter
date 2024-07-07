@@ -58,10 +58,14 @@ public class ShelterController {
                     @ApiResponse(responseCode = "404", description = "Shelter not found")
             })
     public ResponseEntity<Shelter> findShelterById(@PathVariable Long id) {
-        Optional<Shelter> shelter = shelterService.findShelterById(id);
-        return shelter.map(value -> ResponseEntity.status(HttpStatus.OK).body(value))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        Shelter shelter = shelterService.findShelterById(id);
+        if (shelter != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(shelter);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
+
 
     /**
      * Обрабатывает PUT-запрос для редактирования приюта.
@@ -79,8 +83,8 @@ public class ShelterController {
                     @ApiResponse(responseCode = "404", description = "Shelter not found")
             })
     public ResponseEntity<Shelter> editShelter(@RequestBody Shelter shelter, @PathVariable Long id) {
-        Optional<Shelter> foundShelter = shelterService.findShelterById(id);
-        if (foundShelter.isPresent()) {
+        Shelter foundShelter = shelterService.findShelterById(id);
+        if (foundShelter != null) {
             Shelter updatedShelter = shelterService.editShelter(shelter);
             return ResponseEntity.status(HttpStatus.OK).body(updatedShelter);
         }

@@ -25,6 +25,6 @@ public class Shelter {
     private String name;
     @Column(nullable = false)
     private String address;
-    @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Pet> pets;      // связать с классом Pet
 }

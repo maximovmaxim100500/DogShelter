@@ -36,7 +36,7 @@ public class Pet {
     @JoinColumn(name = "user_id", nullable = true)
     private User user;          // связать с классом User
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shelter_id", nullable = false)
     private Shelter shelter;    // связать с классом Shelter
 }

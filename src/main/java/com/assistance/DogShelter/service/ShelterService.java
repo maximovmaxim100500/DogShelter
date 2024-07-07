@@ -37,8 +37,9 @@ public class ShelterService {
      * @param id Идентификатор приюта.
      * @return Приют с указанным идентификатором, если найден.
      */
-    public Optional<Shelter> findShelterById(Long id) {
-        return shelterRepository.findById(id);
+    public Shelter findShelterById(Long id) {
+        Optional<Shelter> shelterOptional = shelterRepository.findById(id);
+        return shelterOptional.orElse(null);
     }
 
     /**

@@ -155,10 +155,10 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
     public void showDirection(long chatId, long shelterId) {
         // Логика получения адреса из базы данных по shelterId и отправка сообщений в Telegram
-        Optional<Shelter> shelter = shelterService.findShelterById(shelterId);
-        if (shelter.isPresent()) {
+        Shelter shelter = shelterService.findShelterById(shelterId);
+        if (shelter != null) {
             StringBuilder shelterDirection = new StringBuilder("Адрес приюта:\n");
-            shelterDirection.append(shelter.get().getAddress());
+            shelterDirection.append(shelter.getAddress());
             sendMessage(chatId, shelterDirection.toString());
         } else {
             sendMessage(chatId, "К сожалению, не удалось найти приют с указанным идентификатором.");
