@@ -51,8 +51,8 @@ public class CallBackQueryHandler {
                     bot.showMoreMenu(chatId, messageId, text4);
                     break;
                 case "ShelterAddress":
-                    bot.sendMessage(chatId, "Наш адрес");
                     // загрузить из БД
+                    bot.showDirection(chatId);
                     break;
                 case "Schedule":
                     bot.sendMessage(chatId, Constants.TEXTSHELTERSHEDULE);
@@ -72,6 +72,7 @@ public class CallBackQueryHandler {
                     break;
                 case "OurPets":
                     // вытягиваем список из БД
+                    bot.showPets(chatId, 1L);
                     break;
                 case "DocumentsForAdopt":
                     bot.sendMessage(chatId, Constants.DOCUMENTSFORADOPT);
@@ -91,19 +92,19 @@ public class CallBackQueryHandler {
                 case "Transporting":
                     bot.sendMessage(chatId, Constants.RECOMMENDATIONSFORTRANSPORTINGPETS);
                     break;
-                case "Arrangeforpuppy":
+                case "ArrangeForPuppy":
                     bot.sendMessage(chatId, Constants.ARRANGEFORPUPPY);
                     break;
-                case "Arrangeforadultanimal":
+                case "ArrangeForAdultAnimal":
                     bot.sendMessage(chatId, Constants.ARRANGEFORADULTANIMAL);
                     break;
-                case "Arrangeforspecialanimal":
+                case "ArrangeForSpecialAnimal":
                     bot.sendMessage(chatId, Constants.ARRANGEFORSPECIALANIMAL);
                     break;
-                case "Advicedoghandler":
+                case "AdviceDogHandler":
                     bot.sendMessage(chatId, Constants.ADVICEDOGHADLER);
                     break;
-                case "Doghandler":
+                case "DogHandler":
                     bot.sendMessage(chatId, Constants.RECOMMENDEDDOGHANDLER);
                     break;
                 case "ComeBack1":

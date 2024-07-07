@@ -83,7 +83,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    public void showShelterInfo(long chatId, long messageId, String text, long shelterId) {
+    public void showShelterInfo(long chatId, long messageId, String text) {
         EditMessageText message = new EditMessageText();
         message.setChatId(String.valueOf(chatId));
         message.setText(text);
@@ -154,13 +154,11 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         sendMessage(chatId, petsInfo.toString());
     }
-    public void showDirection(long chatId, long shelterId) {
+    public void showDirection(long chatId) {
         // Логика получения адреса из базы данных по shelterId и отправка сообщений в Telegram
-        Shelter shelter = shelterService.findShelterById(shelterId);
+        Shelter shelter = shelterService.findShelterById(1L);
         if (shelter != null) {
-            StringBuilder shelterDirection = new StringBuilder("Адрес приюта:\n");
-            shelterDirection.append(shelter.getAddress());
-            sendMessage(chatId, shelterDirection.toString());
+            sendMessage(chatId, "Адрес приюта:\n" + shelter.getAddress());
         } else {
             sendMessage(chatId, "К сожалению, не удалось найти приют с указанным идентификатором.");
         }
