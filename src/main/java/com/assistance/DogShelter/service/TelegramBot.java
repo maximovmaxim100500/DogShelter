@@ -91,44 +91,45 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> rowInline1 = new ArrayList<>();
-        List<InlineKeyboardButton> rowInline2 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine1 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine2 = new ArrayList<>();
         List<InlineKeyboardButton> rowInLine3 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine4 = new ArrayList<>();
 
-        InlineKeyboardButton buttonOurPets = new InlineKeyboardButton();
-        buttonOurPets.setText("Наши питомцы");
-        buttonOurPets.setCallbackData("OurPets_" + shelterId);
+        InlineKeyboardButton buttonAddress = new InlineKeyboardButton("Наш адрес");
+        buttonAddress.setCallbackData("ShelterAddress");
 
-        InlineKeyboardButton buttonSchedule = new InlineKeyboardButton();
-        buttonSchedule.setText("Расписание");
+        InlineKeyboardButton buttonSchedule = new InlineKeyboardButton("Время работы");
         buttonSchedule.setCallbackData("Schedule");
 
-        InlineKeyboardButton buttonDirections = new InlineKeyboardButton();
-        buttonDirections.setText("Схема проезда");
-        buttonDirections.setCallbackData("Directions_" + shelterId);
 
-        InlineKeyboardButton buttonContacts = new InlineKeyboardButton();
-        buttonContacts.setText("Контакты");
-        buttonContacts.setCallbackData("Contacts");
+        InlineKeyboardButton buttonDirections = new InlineKeyboardButton("Схема проезда");
+        buttonDirections.setCallbackData("Directions");
 
-        InlineKeyboardButton buttonQuestions = new InlineKeyboardButton();
-        buttonQuestions.setText("Остались вопросы");
-        buttonQuestions.setCallbackData("Questions");
+        InlineKeyboardButton buttonRules = new InlineKeyboardButton("Правила ТБ");
+        buttonRules.setCallbackData("Rules");
 
-        InlineKeyboardButton buttonBack = new InlineKeyboardButton();
-        buttonBack.setText("Назад");
+        InlineKeyboardButton buttonPassIssuance = new InlineKeyboardButton("Оформление пропуска");
+        buttonPassIssuance.setCallbackData("PassIssuance");
+
+        InlineKeyboardButton buttonCallVolunteer = new InlineKeyboardButton("Позвать волонтера");
+        buttonCallVolunteer.setCallbackData("CallVolunteer");
+
+        InlineKeyboardButton buttonBack = new InlineKeyboardButton("Назад");
         buttonBack.setCallbackData("ComeBack1");
 
-        rowInline1.add(buttonOurPets);
-        rowInline1.add(buttonSchedule);
-        rowInline2.add(buttonDirections);
-        rowInline2.add(buttonContacts);
-        rowInline2.add(buttonQuestions);
-        rowInLine3.add(buttonBack);
+        rowInLine1.add(buttonAddress);
+        rowInLine1.add(buttonSchedule);
+        rowInLine2.add(buttonDirections);
+        rowInLine2.add(buttonRules);
+        rowInLine3.add(buttonPassIssuance);
+        rowInLine3.add(buttonCallVolunteer);
+        rowInLine4.add(buttonBack);
 
-        rowsInline.add(rowInline1);
-        rowsInline.add(rowInline2);
+        rowsInline.add(rowInLine1);
+        rowsInline.add(rowInLine2);
         rowsInline.add(rowInLine3);
+        rowsInline.add(rowInLine4);
 
         markupInline.setKeyboard(rowsInline);
         message.setReplyMarkup(markupInline);
@@ -165,29 +166,209 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    public void showGetPetMenu(long chatId, long messageId, String text) {
+        EditMessageText message = new EditMessageText();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(text);
+        message.setMessageId((int) messageId);
+
+        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine1 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine2 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine3 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine4 = new ArrayList<>();
+
+        InlineKeyboardButton buttonOurPets = new InlineKeyboardButton("Наши питомцы");
+        buttonOurPets.setCallbackData("OurPets");
+
+        InlineKeyboardButton buttonDocumentsForAdopt = new InlineKeyboardButton("Документы для опекунства");
+        buttonDocumentsForAdopt.setCallbackData("DocumentsForAdopt");
+
+        InlineKeyboardButton buttonRulesIntroduction = new InlineKeyboardButton("Правила знакомства");
+        buttonRulesIntroduction.setCallbackData("RulesIntroduction");
+
+        InlineKeyboardButton buttonReasonsRefusal = new InlineKeyboardButton("Причины отказа");
+        buttonReasonsRefusal.setCallbackData("ReasonsRefusal");
+
+        InlineKeyboardButton buttonLeaveRequest = new InlineKeyboardButton("Оставить заявку");
+        buttonLeaveRequest.setCallbackData("LeaveRequest");
+
+        InlineKeyboardButton buttonCallVolunteer = new InlineKeyboardButton("Позвать волонтера");
+        buttonCallVolunteer.setCallbackData("CallVolunteer");
+
+        InlineKeyboardButton buttonBack = new InlineKeyboardButton("Назад");
+        buttonBack.setCallbackData("ComeBack1");
+
+        rowInLine1.add(buttonOurPets);
+        rowInLine1.add(buttonDocumentsForAdopt);
+        rowInLine2.add(buttonRulesIntroduction);
+        rowInLine2.add(buttonReasonsRefusal);
+        rowInLine3.add(buttonLeaveRequest);
+        rowInLine3.add(buttonCallVolunteer);
+        rowInLine4.add(buttonBack);
+
+        rowsInline.add(rowInLine1);
+        rowsInline.add(rowInLine2);
+        rowsInline.add(rowInLine3);
+        rowsInline.add(rowInLine4);
+
+        markupInline.setKeyboard(rowsInline);
+        message.setReplyMarkup(markupInline);
+
+        try {
+            execute(message);
+            log.info("Отправлено меню информации о приюте в чат: " + chatId);
+        } catch (TelegramApiException e) {
+            log.error("Ошибка при отправке меню информации о приюте: " + e.getMessage(), e);
+        }
+    }
+
+    public void showRecommendationsMenu(long chatId, long messageId, String text) {
+        EditMessageText message = new EditMessageText();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(text);
+        message.setMessageId((int) messageId);
+
+        InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup();
+
+        List<InlineKeyboardButton> rowInLine1 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine2 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine3 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine4 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine5 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine6 = new ArrayList<>();
+        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+
+        InlineKeyboardButton buttonTransporting = new InlineKeyboardButton("Транспортировка питомца");
+        buttonTransporting.setCallbackData("Transporting");
+
+        InlineKeyboardButton buttonArrangeForPuppy = new InlineKeyboardButton("Оборудование места для щенка");
+        buttonArrangeForPuppy.setCallbackData("Arrangeforpuppy");
+
+        InlineKeyboardButton buttonArrangeForAdultAnimal = new InlineKeyboardButton("Оборудование места для взрослого питомца");
+        buttonArrangeForAdultAnimal.setCallbackData("Arrangeforadultanimal");
+
+        InlineKeyboardButton buttonArrangeForSpecialAnimal = new InlineKeyboardButton("Оборудование места для " +
+                "питомца с ограниченными возможностями");
+        buttonArrangeForSpecialAnimal.setCallbackData("Arrangeforspecialanimal");
+
+        InlineKeyboardButton buttonAdviceDogHandler = new InlineKeyboardButton("Советы кинологов");
+        buttonAdviceDogHandler.setCallbackData("Advicedoghandler");
+
+        InlineKeyboardButton buttonDogHandler = new InlineKeyboardButton("Проверенные кинологи");
+        buttonDogHandler.setCallbackData("Doghandler");
+
+        InlineKeyboardButton buttonBack = new InlineKeyboardButton("Назад");
+        buttonBack.setCallbackData("ComeBack1");
+
+        rowInLine1.add(buttonTransporting);
+        rowInLine2.add(buttonArrangeForPuppy);
+        rowInLine3.add(buttonArrangeForAdultAnimal);
+        rowInLine4.add(buttonArrangeForSpecialAnimal);
+        rowInLine5.add(buttonAdviceDogHandler);
+        rowInLine5.add(buttonDogHandler);
+        rowInLine6.add(buttonBack);
+
+        rowsInLine.add(rowInLine1);
+        rowsInLine.add(rowInLine2);
+        rowsInLine.add(rowInLine3);
+        rowsInLine.add(rowInLine4);
+        rowsInLine.add(rowInLine5);
+        rowsInLine.add(rowInLine6);
+
+        markupInLine.setKeyboard(rowsInLine);
+        message.setReplyMarkup(markupInLine);
+
+        try {
+            execute(message);
+            log.info("Отправлено меню Дополнительно в чат: " + chatId);
+        } catch (TelegramApiException e) {
+            log.error("Ошибка при отправке меню Дополнительно: " + e.getMessage(), e);
+        }
+    }
+
+    public void showMoreMenu(long chatId, long messageId, String text) {
+        EditMessageText message = new EditMessageText();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(text);
+        message.setMessageId((int) messageId);
+
+        InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup();
+
+        List<InlineKeyboardButton> rowInLine1 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine2 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine3 = new ArrayList<>();
+        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+
+        InlineKeyboardButton buttonRegisterVolunteer = new InlineKeyboardButton("Зарегистрироваться как волонтёр");
+        buttonRegisterVolunteer.setCallbackData("RegisterVolunteer");
+
+        InlineKeyboardButton buttonReport = new InlineKeyboardButton("Сдать отчёт");
+        buttonReport.setCallbackData("Report");
+
+        InlineKeyboardButton buttonCallVolunteer = new InlineKeyboardButton("Позвать волонтера");
+        buttonCallVolunteer.setCallbackData("CallVolunteer");
+
+        InlineKeyboardButton buttonBack = new InlineKeyboardButton("Назад");
+        buttonBack.setCallbackData("ComeBack1");
+
+        rowInLine1.add(buttonRegisterVolunteer);
+        rowInLine2.add(buttonReport);
+        rowInLine2.add(buttonCallVolunteer);
+        rowInLine3.add(buttonBack);
+
+        rowsInLine.add(rowInLine1);
+        rowsInLine.add(rowInLine2);
+        rowsInLine.add(rowInLine3);
+
+        markupInLine.setKeyboard(rowsInLine);
+        message.setReplyMarkup(markupInLine);
+
+        try {
+            execute(message);
+            log.info("Отправлено меню Дополнительно в чат: " + chatId);
+        } catch (TelegramApiException e) {
+            log.error("Ошибка при отправке меню Дополнительно: " + e.getMessage(), e);
+        }
+    }
+
     public void startCommandReceived(long chatId, String name) {
         // Формирование приветственного сообщения
         String greetingMessage = "Привет, " + name + "! Добро пожаловать в наш приют для собак!";
         sendMessage(chatId, greetingMessage);
-        choosingShelter(chatId);
+        choosingMenu(chatId);
     }
 
-    public void choosingShelter(long chatId) {
+    public void choosingMenu(long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText("Выберите приют:");
+        message.setText("Выберите пункт меню:");
 
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline1 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline2 = new ArrayList<>();
 
-        InlineKeyboardButton buttonShelter1 = new InlineKeyboardButton();
-        buttonShelter1.setText("Приют 1");
-        buttonShelter1.setCallbackData("Приют_1");
+        InlineKeyboardButton buttonMenu1 = new InlineKeyboardButton("Наш приют");
+        buttonMenu1.setCallbackData("Shelter");
 
-        rowInline.add(buttonShelter1);
+        InlineKeyboardButton buttonMenu2 = new InlineKeyboardButton("Взять питомца");
+        buttonMenu2.setCallbackData("Get_pet");
 
-        rowsInline.add(rowInline);
+        InlineKeyboardButton buttonMenu3 = new InlineKeyboardButton("Рекомендации");
+        buttonMenu3.setCallbackData("Recommendations");
+      
+        InlineKeyboardButton buttonMenu4 = new InlineKeyboardButton("Дополнительно");
+        buttonMenu4.setCallbackData("More");
+
+        rowInline1.add(buttonMenu1);
+        rowInline1.add(buttonMenu2);
+        rowInline2.add(buttonMenu3);
+        rowInline2.add(buttonMenu4);
+
+        rowsInline.add(rowInline1);
+        rowsInline.add(rowInline2);
         markupInline.setKeyboard(rowsInline);
         message.setReplyMarkup(markupInline);
 
