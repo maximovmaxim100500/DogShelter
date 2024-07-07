@@ -1,5 +1,6 @@
 package com.assistance.DogShelter.service;
 
+import com.assistance.DogShelter.constants.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -28,31 +29,84 @@ public class CallBackQueryHandler {
 
         try {
             switch (callbackData) {
-                case "Приют_1":
-                    String text1 = "Приют1. Выберите действие:";
+                //Пункт меню "Наш приют"
+                case "Shelter":
+                    String text1 = "Наш приют:";
                     bot.showShelterInfo(chatId, messageId, text1);
                     break;
-                case "Приют_2":
-                    String text2 = "Приют2. Выберите действие:";
-                    bot.showShelterInfo(chatId, messageId, text2);
+                //Пункт меню "Взять питомца"
+                case "Get_pet":
+                    String text2 = "Взять питомца:";
+                    bot.showGetPetMenu(chatId, messageId, text2);
                     break;
-                case "ShelterInfo":
-                    bot.sendMessage(chatId, "Информация о приюте");
+                //Пункт меню "Рекомендации"
+                case "Recommendations":
+                    String text3 = "Рекомендации";
+                    bot.showRecommendationsMenu(chatId, messageId, text3);
                     break;
-                case "TakeTheDog":
-                    bot.sendMessage(chatId, "Чтобы взять собаку нужно...");
+                //Пункт меню "Дополнительно"
+                case "More":
+                    String text4 = "Дополнительно";
+                    bot.showMoreMenu(chatId, messageId, text4);
                     break;
-                case "DogReport":
-                    bot.sendMessage(chatId, "Вот ваш отчет");
+                case "ShelterAddress":
+                    bot.sendMessage(chatId, "Наш адрес");
+                    // загрузить из БД
+                    break;
+                case "Schedule":
+                    bot.sendMessage(chatId, Constants.TEXTSHELTERSHEDULE);
+                    break;
+                case "Directions":
+                    bot.sendMessage(chatId, "Схема проезда");
+                    // загрузить из БД
+                    break;
+                case "Rules":
+                    bot.sendMessage(chatId, Constants.TEXTSAFETYGUIDEFORDOGSSHELTER);
+                    break;
+                case "PassIssuance":
+                    bot.sendMessage(chatId, Constants.TEXTPASSISSUANCE);
                     break;
                 case "CallVolunteer":
                     bot.sendMessage(chatId, "Зовем волонтера");
                     break;
+                case "OurPets":
+                    // вытягиваем список из БД
+                    break;
+                case "DocumentsForAdopt":
+                    bot.sendMessage(chatId, Constants.DOCUMENTSFORADOPT);
+                    break;
+                case "RulesIntroduction":
+                    bot.sendMessage(chatId, Constants.RULESFORINTRODUCINGPETS);
+                    break;
+                case "ReasonsRefusal":
+                    bot.sendMessage(chatId, Constants.REASONSFORREFUSAL);
+                    break;
+                case "LeaveRequest":
+                    // - задел на будущее
+                    break;
                 case "RegisterVolunteer":
-                    textMessageHandler.handleTextMessage(update);
+                    volunteerRegistrationService.registerVolunteer(update);
+                    break;
+                case "Transporting":
+                    bot.sendMessage(chatId, Constants.RECOMMENDATIONSFORTRANSPORTINGPETS);
+                    break;
+                case "Arrangeforpuppy":
+                    bot.sendMessage(chatId, Constants.ARRANGEFORPUPPY);
+                    break;
+                case "Arrangeforadultanimal":
+                    bot.sendMessage(chatId, Constants.ARRANGEFORADULTANIMAL);
+                    break;
+                case "Arrangeforspecialanimal":
+                    bot.sendMessage(chatId, Constants.ARRANGEFORSPECIALANIMAL);
+                    break;
+                case "Advicedoghandler":
+                    bot.sendMessage(chatId, Constants.ADVICEDOGHADLER);
+                    break;
+                case "Doghandler":
+                    bot.sendMessage(chatId, Constants.RECOMMENDEDDOGHANDLER);
                     break;
                 case "ComeBack1":
-                    bot.choosingShelter(chatId);
+                    bot.choosingMenu(chatId);
                     break;
                 default:
                     log.warn("Unknown callback data received: " + callbackData);
