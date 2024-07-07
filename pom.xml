@@ -72,6 +72,18 @@
 				<configuration>
 					<propertyFile>src/main/resources/liquibase.properties</propertyFile>
 				</configuration>
+				<executions>
+					<execution>
+						<id>rollback</id>
+						<phase>process-resources</phase> <!-- Вы можете выбрать любую фазу, в зависимости от ваших требований -->
+						<goals>
+							<goal>rollback</goal>
+						</goals>
+						<configuration>
+							<rollbackTag>YOUR_TAG_TO_ROLLBACK_TO</rollbackTag> <!-- Тег, до которого нужно откатиться -->
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * Модель для представления изображений, загруженных в хранилище.
  */
 @Entity
-@Table(name = "drive_dir_picture")
+@Table(name = "drive_dir_pictures")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

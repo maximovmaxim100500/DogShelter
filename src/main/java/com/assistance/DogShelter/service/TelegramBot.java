@@ -1,6 +1,8 @@
 package com.assistance.DogShelter.service;
 
 import com.assistance.DogShelter.config.BotConfig;
+import com.assistance.DogShelter.model.Pet;
+import com.assistance.DogShelter.model.Shelter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,12 +26,16 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final BotConfig botConfig;
     private final CallBackQueryHandler callBackQueryHandler;
     private final TextMessageHandler textMessageHandler;
+    private final PetService petService;
+    private final ShelterService shelterService;
 
     @Autowired
-    public TelegramBot(BotConfig botConfig, CallBackQueryHandler callBackQueryHandler, TextMessageHandler textMessageHandler) {
+    public TelegramBot(BotConfig botConfig, CallBackQueryHandler callBackQueryHandler, TextMessageHandler textMessageHandler, PetService petService, ShelterService shelterService) {
         this.botConfig = botConfig;
         this.callBackQueryHandler = callBackQueryHandler;
         this.textMessageHandler = textMessageHandler;
+        this.petService = petService;
+        this.shelterService = shelterService;
 
         // Инициализация списка команд для бота
         List<BotCommand> listOfCommands = new ArrayList<>();
@@ -77,7 +83,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    public void showShelterInfo(long chatId, long messageId, String text) {
+    public void showShelterInfo(long chatId, long messageId, String text, long shelterId) {
         EditMessageText message = new EditMessageText();
         message.setChatId(String.valueOf(chatId));
         message.setText(text);
@@ -95,6 +101,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         InlineKeyboardButton buttonSchedule = new InlineKeyboardButton("Время работы");
         buttonSchedule.setCallbackData("Schedule");
+
 
         InlineKeyboardButton buttonDirections = new InlineKeyboardButton("Схема проезда");
         buttonDirections.setCallbackData("Directions");
@@ -132,6 +139,30 @@ public class TelegramBot extends TelegramLongPollingBot {
             log.info("Отправлено меню информации о приюте в чат: " + chatId);
         } catch (TelegramApiException e) {
             log.error("Ошибка при отправке меню информации о приюте: " + e.getMessage(), e);
+        }
+    }
+    public void showPets(long chatId, long shelterId) {
+        // Логика получения питомцев из базы данных по shelterId и отправка сообщений в Telegram
+        List<Pet> pets = (List<Pet>) petService.getPetsByShelterId(shelterId);
+        StringBuilder petsInfo = new StringBuilder("Наши питомцы:\n");
+
+        for (Pet pet : pets) {
+            petsInfo.append("Имя: ").append(pet.getName()).append("\n")
+                    .append("Порода: ").append(pet.getBreed()).append("\n")
+                    .append("Возраст: ").append(pet.getAge()).append("\n\n");
+        }
+
+        sendMessage(chatId, petsInfo.toString());
+    }
+    public void showDirection(long chatId, long shelterId) {
+        // Логика получения адреса из базы данных по shelterId и отправка сообщений в Telegram
+        Shelter shelter = shelterService.findShelterById(shelterId);
+        if (shelter != null) {
+            StringBuilder shelterDirection = new StringBuilder("Адрес приюта:\n");
+            shelterDirection.append(shelter.getAddress());
+            sendMessage(chatId, shelterDirection.toString());
+        } else {
+            sendMessage(chatId, "К сожалению, не удалось найти приют с указанным идентификатором.");
         }
     }
 
@@ -327,7 +358,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         InlineKeyboardButton buttonMenu3 = new InlineKeyboardButton("Рекомендации");
         buttonMenu3.setCallbackData("Recommendations");
-
+      
         InlineKeyboardButton buttonMenu4 = new InlineKeyboardButton("Дополнительно");
         buttonMenu4.setCallbackData("More");
 

@@ -26,6 +26,7 @@ public class CallBackQueryHandler {
         long messageId = update.getCallbackQuery().getMessage().getMessageId();
         long chatId = update.getCallbackQuery().getMessage().getChatId();
         TelegramBot bot = applicationContext.getBean(TelegramBot.class);
+        Long shelterId = null; // Объявляем shelterId для использования внутри метода
 
         try {
             switch (callbackData) {

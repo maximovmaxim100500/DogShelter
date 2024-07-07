@@ -1,8 +1,6 @@
 package com.assistance.DogShelter.model;
 
-import com.assistance.DogShelter.enums.Food;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +33,10 @@ public class Pet {
     private String food;        // предпочитаемая еда питомца
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties("pets")
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;          // связать с классом User
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shelter_id", nullable = false)
+    private Shelter shelter;    // связать с классом Shelter
 }

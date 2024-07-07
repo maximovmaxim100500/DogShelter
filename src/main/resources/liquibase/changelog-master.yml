@@ -1,17 +1,81 @@
 databaseChangeLog:
-  - include:
-      file: liquibase/scripts/pets-tables.sql
-  - include:
-      file: liquibase/scripts/pet-avatars-tables.sql
-  - include:
-      file: liquibase/scripts/reports-tables.sql
-  - include:
-      file: liquibase/scripts/users-tables.sql
-  - include:
-      file: liquibase/scripts/volunteers-tables.sql
-  - include:
-      file: liquibase/scripts/shelters-tables.sql
-  - include:
-      file: liquibase/scripts/drive-dir-picture.sql
-  - include:
-      file: liquibase/scripts/photos-reports-tables.sql
+  - property:
+      name: changeset.id.sequence
+      value: 11
+
+  - changeSet:
+      id: 1
+      author: mmaksimov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/shelters-tables.sql
+
+  - changeSet:
+      id: 2
+      author: dsiliukov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/pets-tables.sql
+
+  - changeSet:
+      id: 3
+      author: dsiliukov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/pet-avatars-tables.sql
+
+  - changeSet:
+      id: 4
+      author: mmaksimov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/reports-tables.sql
+
+  - changeSet:
+      id: 5
+      author: mmaksimov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/users-tables.sql
+
+  - changeSet:
+      id: 6
+      author: dkhan
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/volunteers-tables.sql
+
+  - changeSet:
+      id: 7
+      author: dsiliukov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/drive-dir-pictures.sql
+
+  - changeSet:
+      id: 8
+      author: mmaksimov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/photo-reports-tables.sql
+
+  - changeSet:
+      id: 9
+      author: dsiliukov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/shelters-insert.sql
+
+  - changeSet:
+      id: 10
+      author: dsiliukov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/pets-insert.sql
+
+  - changeSet:
+      id: 11
+      author: dsiliukov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/pets-tables-column-user-id.sql

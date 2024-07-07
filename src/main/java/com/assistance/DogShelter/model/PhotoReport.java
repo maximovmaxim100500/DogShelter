@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * Модель для представления фото отчета.
  */
 @Entity
-@Table(name = "photo_report")
+@Table(name = "photo_reports")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
