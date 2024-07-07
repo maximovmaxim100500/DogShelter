@@ -185,12 +185,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         buttonShelter1.setText("Приют 1");
         buttonShelter1.setCallbackData("Приют_1");
 
-        InlineKeyboardButton buttonShelter2 = new InlineKeyboardButton();
-        buttonShelter2.setText("Приют 2");
-        buttonShelter2.setCallbackData("Приют_2");
-
         rowInline.add(buttonShelter1);
-        rowInline.add(buttonShelter2);
 
         rowsInline.add(rowInline);
         markupInline.setKeyboard(rowsInline);

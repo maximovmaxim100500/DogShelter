@@ -40,10 +40,6 @@ public class CallBackQueryHandler {
                         String text1 = "Приют1. Выберите действие:";
                         bot.showShelterInfo(chatId, messageId, text1, 1L);
                         break;
-                    case "Приют_2":
-                        String text2 = "Приют2. Выберите действие:";
-                        bot.showShelterInfo(chatId, messageId, text2, 2L);
-                        break;
                     case "ShelterInfo":
                         bot.sendMessage(chatId, "Информация о приюте");
                         break;
