@@ -37,7 +37,7 @@ public class CallBackQueryHandler {
                 //Пункт меню "Взять питомца"
                 case "Get_pet":
                     String text2 = "Взять питомца:";
-
+                    bot.showGetPetMenu(chatId, messageId, text2);
                     break;
                 //Пункт меню "Рекомендации"
                 case "Recommendations":
@@ -68,6 +68,21 @@ public class CallBackQueryHandler {
                     break;
                 case "CallVolunteer":
                     bot.sendMessage(chatId, "Зовем волонтера");
+                    break;
+                case "OurPets":
+                    // вытягиваем список из БД
+                    break;
+                case "DocumentsForAdopt":
+                    bot.sendMessage(chatId, Constants.DOCUMENTSFORADOPT);
+                    break;
+                case "RulesIntroduction":
+                    bot.sendMessage(chatId, Constants.RULESFORINTRODUCINGPETS);
+                    break;
+                case "ReasonsRefusal":
+                    bot.sendMessage(chatId, Constants.REASONSFORREFUSAL);
+                    break;
+                case "LeaveRequest":
+                    // - задел на будущее
                     break;
                 case "RegisterVolunteer":
                     volunteerRegistrationService.registerVolunteer(update);

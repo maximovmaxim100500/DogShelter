@@ -135,6 +135,64 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    public void showGetPetMenu(long chatId, long messageId, String text) {
+        EditMessageText message = new EditMessageText();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(text);
+        message.setMessageId((int) messageId);
+
+        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine1 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine2 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine3 = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine4 = new ArrayList<>();
+
+        InlineKeyboardButton buttonOurPets = new InlineKeyboardButton("Наши питомцы");
+        buttonOurPets.setCallbackData("OurPets");
+
+        InlineKeyboardButton buttonDocumentsForAdopt = new InlineKeyboardButton("Документы для опекунства");
+        buttonDocumentsForAdopt.setCallbackData("DocumentsForAdopt");
+
+        InlineKeyboardButton buttonRulesIntroduction = new InlineKeyboardButton("Правила знакомства");
+        buttonRulesIntroduction.setCallbackData("RulesIntroduction");
+
+        InlineKeyboardButton buttonReasonsRefusal = new InlineKeyboardButton("Причины отказа");
+        buttonReasonsRefusal.setCallbackData("ReasonsRefusal");
+
+        InlineKeyboardButton buttonLeaveRequest = new InlineKeyboardButton("Оставить заявку");
+        buttonLeaveRequest.setCallbackData("LeaveRequest");
+
+        InlineKeyboardButton buttonCallVolunteer = new InlineKeyboardButton("Позвать волонтера");
+        buttonCallVolunteer.setCallbackData("CallVolunteer");
+
+        InlineKeyboardButton buttonBack = new InlineKeyboardButton("Назад");
+        buttonBack.setCallbackData("ComeBack1");
+
+        rowInLine1.add(buttonOurPets);
+        rowInLine1.add(buttonDocumentsForAdopt);
+        rowInLine2.add(buttonRulesIntroduction);
+        rowInLine2.add(buttonReasonsRefusal);
+        rowInLine3.add(buttonLeaveRequest);
+        rowInLine3.add(buttonCallVolunteer);
+        rowInLine4.add(buttonBack);
+
+        rowsInline.add(rowInLine1);
+        rowsInline.add(rowInLine2);
+        rowsInline.add(rowInLine3);
+        rowsInline.add(rowInLine4);
+
+        markupInline.setKeyboard(rowsInline);
+        message.setReplyMarkup(markupInline);
+
+        try {
+            execute(message);
+            log.info("Отправлено меню информации о приюте в чат: " + chatId);
+        } catch (TelegramApiException e) {
+            log.error("Ошибка при отправке меню информации о приюте: " + e.getMessage(), e);
+        }
+    }
+
     public void showRecommendationsMenu(long chatId, long messageId, String text) {
         EditMessageText message = new EditMessageText();
         message.setChatId(String.valueOf(chatId));
