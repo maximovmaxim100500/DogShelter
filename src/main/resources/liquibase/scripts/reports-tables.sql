@@ -14,3 +14,4 @@ CREATE TABLE IF NOT EXISTS reports (
 -- Создание колонки check
 ALTER TABLE reports
     ADD COLUMN check_report BOOLEAN;       --Статус отчета
+
