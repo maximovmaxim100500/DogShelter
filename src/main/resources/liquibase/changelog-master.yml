@@ -86,3 +86,10 @@ databaseChangeLog:
       changes:
         - sqlFile:
             path: liquibase/scripts/change-users-and-reports.sql
+
+  - changeSet:
+      id: 13
+      author: mmaksimov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/change-pets-date.sql
