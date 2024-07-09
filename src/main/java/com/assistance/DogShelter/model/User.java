@@ -44,4 +44,7 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Report> reports; //связать с классом Report
+
+    @Column(name = "extension", nullable = false)
+    private boolean extension;       //Статус для отчетности. Срок продлен или нет.
 }
