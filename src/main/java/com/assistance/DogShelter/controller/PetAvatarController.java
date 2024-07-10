@@ -1,12 +1,23 @@
 package com.assistance.DogShelter.controller;
+import com.assistance.DogShelter.db.model.DriveDirPicture;
 import com.assistance.DogShelter.db.model.PetAvatar;
 import com.assistance.DogShelter.service.PetAvatarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 /**
@@ -14,7 +25,8 @@ import java.util.Optional;
  * Включает основные CRUD-запросы.
  */
 @RestController
-@RequestMapping("/petAvatars")
+@RequestMapping("/api/petAvatars")
+@Tag(name = "PetAvatars", description = "API для работы с изображениями")
 public class PetAvatarController {
 
     private final PetAvatarService petAvatarService;
@@ -23,87 +35,37 @@ public class PetAvatarController {
         this.petAvatarService = petAvatarService;
     }
 
-    /**
-     * Обрабатывает POST-запрос для добавления нового аватара питомца.
-     *
-     * @param petAvatar Переданный аватар в теле запроса.
-     * @return Аватар, который был добавлен с помощью сервиса.
-     */
-    @PostMapping("/add")
-    @Operation(summary = "Add pet avatar",
-            description = "Adds a new pet avatar to the system",
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Successfully created"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request")
-            })
-    public ResponseEntity<PetAvatar> addPetAvatar(@RequestBody PetAvatar petAvatar) {
-        PetAvatar addPetAvatar = petAvatarService.addPetAvatar(petAvatar);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addPetAvatar);
-    }
-
-    /**
-     * Обрабатывает GET-запрос для поиска аватара по идентификатору.
-     *
-     * @param id Идентификатор аватара.
-     * @return Аватар с указанным идентификатором, если найден, в противном случае возвращает 404 ошибку.
-     */
-    @GetMapping("{id}")
-    @Operation(summary = "Search pet avatar",
-            description = "Searches for a pet avatar in the system",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request"),
-                    @ApiResponse(responseCode = "404", description = "Pet avatar not found")
-            })
-    public ResponseEntity<PetAvatar> findPetAvatarById(@PathVariable Long id) {
-        Optional<PetAvatar> petAvatar = petAvatarService.findPetAvatarById(id);
-        return petAvatar.map(value -> ResponseEntity.status(HttpStatus.OK).body(value))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
-    /**
-     * Обрабатывает PUT-запрос для редактирования аватара питомца.
-     *
-     * @param petAvatar Аватар с обновленными данными в теле запроса.
-     * @param id        Идентификатор редактируемого аватара.
-     * @return Обновленный аватар, если редактирование выполнено успешно, в противном случаи возвращает 404 ошибку.
-     */
-    @PutMapping("{id}")
-    @Operation(summary = "Update pet avatar",
-            description = "Updates a pet avatar's information",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully updated"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request"),
-                    @ApiResponse(responseCode = "404", description = "Pet avatar not found")
-            })
-    public ResponseEntity<PetAvatar> editPetAvatar(@RequestBody PetAvatar petAvatar, @PathVariable Long id) {
-        Optional<PetAvatar> foundPetAvatar = petAvatarService.findPetAvatarById(id);
-        if (foundPetAvatar.isPresent()) {
-            PetAvatar updatedPetAvatar = petAvatarService.editPetAvatar(petAvatar);
-            return ResponseEntity.status(HttpStatus.OK).body(updatedPetAvatar);
+    @PostMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadAvatar(@PathVariable Long id, @RequestParam MultipartFile cover) throws IOException {
+        if(cover.getSize() >= 1024*300) {
+            return  ResponseEntity.badRequest().body("File is too big");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        petAvatarService.uploadCover(id, cover);
+        return  ResponseEntity.ok().build();
     }
+    @GetMapping(value = "/{id}/avatar/preview")
+    public ResponseEntity<byte[]> downloadAvatar(@PathVariable Long id) {
+        PetAvatar petAvatar = petAvatarService.findPicture(id);
 
-    /**
-     * Обрабатывает DELETE-запрос для удаления аватара по его идентификатору.
-     *
-     * @param id Идентификатор аватара для удаления.
-     * @return Подтверждение успешного удаления аватара.
-     */
-    @DeleteMapping("{id}")
-    @Operation(summary = "Remove pet avatar",
-            description = "Removes a pet avatar from the system",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully removed"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request"),
-                    @ApiResponse(responseCode = "404", description = "Pet avatar not found")
-            })
-    public ResponseEntity<Void> deletePetAvatar(@PathVariable Long id) {
-        if (petAvatarService.findPetAvatarById(id).isPresent()) {
-            petAvatarService.deletePetAvatar(id);
-            return ResponseEntity.status(HttpStatus.OK).build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(petAvatar.getMediaType()));
+        headers.setContentLength(petAvatar.getData().length);
+
+        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(petAvatar.getData());
+
+    }
+    @GetMapping(value = "/{id}/avatar")
+    public void downloadAvatar(@PathVariable Long id, HttpServletResponse response) throws IOException {
+        PetAvatar petAvatar = petAvatarService.findPicture(id);
+
+        Path path = Path.of(petAvatar.getFilePath());
+
+        try(InputStream is = Files.newInputStream(path);
+            OutputStream os = response.getOutputStream();) {
+            response.setStatus(200);
+            response.setContentType(petAvatar.getMediaType());
+            response.setContentLength((int) petAvatar.getFileSize());
+            is.transferTo(os);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

@@ -1,6 +1,7 @@
 package com.assistance.DogShelter.controller;
 
 import com.assistance.DogShelter.db.model.Report;
+import com.assistance.DogShelter.db.model.Shelter;
 import com.assistance.DogShelter.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,9 +59,12 @@ public class ReportController {
                     @ApiResponse(responseCode = "404", description = "Report not found")
             })
     public ResponseEntity<Report> findReportById(@PathVariable Long id) {
-        Optional<Report> report = reportService.findReportById(id);
-        return report.map(value -> ResponseEntity.status(HttpStatus.OK).body(value))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        Report report = reportService.findReportById(id);
+        if (report != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(report);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     /**
@@ -79,8 +83,8 @@ public class ReportController {
                     @ApiResponse(responseCode = "404", description = "Report not found")
             })
     public ResponseEntity<Report> editReport(@RequestBody Report report, @PathVariable Long id) {
-        Optional<Report> foundReport = reportService.findReportById(id);
-        if (foundReport.isPresent()) {
+        Report foundReport = reportService.findReportById(id);
+        if (foundReport != null) {
             Report updatedReport = reportService.editReport(report);
             return ResponseEntity.status(HttpStatus.OK).body(updatedReport);
         }

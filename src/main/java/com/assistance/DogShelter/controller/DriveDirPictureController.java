@@ -23,7 +23,7 @@ import java.nio.file.Path;
  * Включает основные CRUD-запросы.
  */
 @RestController
-@RequestMapping("/api/pictures")
+@RequestMapping("/api/dirPictures")
 @Tag(name = "DriveDirPicture", description = "API для работы с изображениями")
 public class DriveDirPictureController {
 
@@ -34,7 +34,7 @@ public class DriveDirPictureController {
         this.driveDirPictureService = driveDirPictureService;
     }
 
-    @PostMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{id}/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadPicture(@PathVariable Long id, @RequestParam MultipartFile cover) throws IOException {
         if(cover.getSize() >= 1024*300) {
             return  ResponseEntity.badRequest().body("File is too big");
@@ -42,8 +42,8 @@ public class DriveDirPictureController {
         driveDirPictureService.uploadCover(id, cover);
         return  ResponseEntity.ok().build();
     }
-    @GetMapping(value = "/{id}/avatar/preview")
-    public ResponseEntity<byte[]> downloadAvatar(@PathVariable Long id) {
+    @GetMapping(value = "/{id}/picture/preview")
+    public ResponseEntity<byte[]> downloadPicture(@PathVariable Long id) {
         DriveDirPicture driveDirPicture = driveDirPictureService.findPicture(id);
 
         HttpHeaders headers = new HttpHeaders();
@@ -53,8 +53,8 @@ public class DriveDirPictureController {
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(driveDirPicture.getData());
 
     }
-    @GetMapping(value = "/{id}/avatar")
-    public void downloadAvatar(@PathVariable Long id, HttpServletResponse response) throws IOException {
+    @GetMapping(value = "/{id}/picture")
+    public void downloadPicture(@PathVariable Long id, HttpServletResponse response) throws IOException {
         DriveDirPicture driveDirPicture = driveDirPictureService.findPicture(id);
 
         Path path = Path.of(driveDirPicture.getFilePath());
