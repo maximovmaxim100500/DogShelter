@@ -19,16 +19,32 @@ public class PetAvatar {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Exclude
     private long id;
+
+    /**
+     * Путь к файлу изображения.
+     */
     @Column(nullable = false)
     private String filePath;
+
+    /**
+     * Размер файла изображения.
+     */
     @Column(nullable = false)
     private long fileSize;
+
+    /**
+     * Тип медиа файла изображения.
+     */
     @Column(nullable = false)
     private String mediaType;
+
+    /**
+     * Данные изображения в виде массива байт.
+     */
     @Lob
     @Column(nullable = false)
     private byte[] data;
     @OneToOne
     @JoinColumn(name = "pet_id", nullable = false)
-    Pet pet;
+    private Pet pet;
 }

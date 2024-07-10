@@ -2,106 +2,70 @@ package com.assistance.DogShelter.controller;
 
 import com.assistance.DogShelter.db.model.PhotoReport;
 import com.assistance.DogShelter.service.PhotoReportService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Контроллер для обработки HTTP-запросов, связанных с фото отчетами.
  * Включает основные CRUD-запросы.
  */
 @RestController
-@RequestMapping("/photoReports")
+@RequestMapping("/api/photoReports")
+@Tag(name = "PhotoReport", description = "API для работы с фото отчетами")
 public class PhotoReportController {
 
     private final PhotoReportService photoReportService;
 
+    @Autowired
     public PhotoReportController(PhotoReportService photoReportService) {
         this.photoReportService = photoReportService;
     }
 
-    /**
-     * Обрабатывает POST-запрос для добавления нового фото отчета.
-     *
-     * @param photoReport Переданный фото отчет в теле запроса.
-     * @return Фото отчет, который был добавлен с помощью сервиса.
-     */
-    @PostMapping("/add")
-    @Operation(summary = "Add photo report",
-            description = "Adds a new photo report to the system",
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Successfully created"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request")
-            })
-    public ResponseEntity<PhotoReport> addPhotoReport(@RequestBody PhotoReport photoReport) {
-        PhotoReport addedPhotoReport = photoReportService.addPhotoReport(photoReport);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedPhotoReport);
-    }
-
-    /**
-     * Обрабатывает GET-запрос для поиска фото отчета по идентификатору.
-     *
-     * @param id Идентификатор фото отчета.
-     * @return Фото отчет с указанным идентификатором, если найден, в противном случае возвращает 404 ошибку.
-     */
-    @GetMapping("{id}")
-    @Operation(summary = "Search photo report",
-            description = "Searches for a photo report in the system",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request"),
-                    @ApiResponse(responseCode = "404", description = "Photo report not found")
-            })
-    public ResponseEntity<PhotoReport> findPhotoReportById(@PathVariable Long id) {
-        Optional<PhotoReport> photoReport = photoReportService.findPhotoReportById(id);
-        return photoReport.map(value -> ResponseEntity.status(HttpStatus.OK).body(value))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
-    /**
-     * Обрабатывает PUT-запрос для редактирования фото отчета.
-     *
-     * @param photoReport Фото отчет с обновленными данными в теле запроса.
-     * @param id         Идентификатор редактируемого фото отчета.
-     * @return Обновленный фото отчет, если редактирование выполнено успешно, в противном случае возвращает 404 ошибку.
-     */
-    @PutMapping("{id}")
-    @Operation(summary = "Update photo report",
-            description = "Updates a photo report's information",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully updated"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request"),
-                    @ApiResponse(responseCode = "404", description = "Photo report not found")
-            })
-    public ResponseEntity<PhotoReport> editPhotoReport(@RequestBody PhotoReport photoReport, @PathVariable Long id) {
-        Optional<PhotoReport> foundPhotoReport = photoReportService.findPhotoReportById(id);
-        if (foundPhotoReport.isPresent()) {
-            PhotoReport updatedPhotoReport = photoReportService.editPhotoReport(photoReport);
-            return ResponseEntity.status(HttpStatus.OK).body(updatedPhotoReport);
+    @PostMapping(value = "/{id}/report", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadReport(@PathVariable Long id, @RequestParam MultipartFile report) throws IOException {
+        if(report.getSize() >= 1024*300) {
+            return ResponseEntity.badRequest().body("File is too big");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        photoReportService.uploadCover(id, report);
+        return ResponseEntity.ok().build();
     }
 
-    /**
-     * Обрабатывает DELETE-запрос для удаления фото отчета по его идентификатору.
-     *
-     * @param id Идентификатор фото отчета для удаления.
-     * @return Подтверждение успешного удаления фото отчета.
-     */
-    @DeleteMapping("{id}")
-    @Operation(summary = "Remove photo report",
-            description = "Removes a photo report from the system",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully removed"),
-                    @ApiResponse(responseCode = "400", description = "Invalid request"),
-                    @ApiResponse(responseCode = "404", description = "Photo report not found")
-            })
-    public ResponseEntity<Void> deletePhotoReport(@PathVariable Long id) {
-        photoReportService.deletePhotoReport(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    @GetMapping(value = "/{id}/report/preview")
+    public ResponseEntity<byte[]> downloadReportPreview(@PathVariable Long id) {
+        PhotoReport photoReport = photoReportService.findPicture(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(photoReport.getMediaType()));
+        headers.setContentLength(photoReport.getData().length);
+
+        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(photoReport.getData());
+    }
+
+    @GetMapping(value = "/{id}/report")
+    public void downloadReport(@PathVariable Long id, HttpServletResponse response) throws IOException {
+        PhotoReport photoReport = photoReportService.findPicture(id);
+
+        Path path = Path.of(photoReport.getFilePath());
+
+        try(InputStream is = Files.newInputStream(path);
+            OutputStream os = response.getOutputStream()) {
+            response.setStatus(200);
+            response.setContentType(photoReport.getMediaType());
+            response.setContentLength((int) photoReport.getFileSize());
+            is.transferTo(os);
+        }
     }
 }

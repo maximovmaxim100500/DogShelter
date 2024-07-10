@@ -37,8 +37,9 @@ public class ReportService {
      * @param id Идентификатор отчета.
      * @return Отчет с указанным идентификатором, если найден.
      */
-    public Optional<Report> findReportById(Long id) {
-        return reportRepository.findById(id);
+    public Report findReportById(Long id) {
+        Optional<Report> reportOptional = reportRepository.findById(id);
+        return reportOptional.orElse(null);
     }
 
     /**
