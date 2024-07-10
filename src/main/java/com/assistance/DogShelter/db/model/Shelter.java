@@ -1,4 +1,4 @@
-package com.assistance.DogShelter.model;
+package com.assistance.DogShelter.db.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,5 +27,5 @@ public class Shelter {
     @Column(nullable = false)
     private String address;
     @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Pet> pets;      // связать с классом Pet
+    private List<Pet> pets;      // связать с классом Pet
 }

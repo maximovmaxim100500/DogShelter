@@ -1,9 +1,8 @@
 package com.assistance.DogShelter.service;
 
-import com.assistance.DogShelter.model.DriveDirPicture;
-import com.assistance.DogShelter.model.Shelter;
-import com.assistance.DogShelter.repositories.DriveDirPictureRepository;
-import com.assistance.DogShelter.repositories.ShelterRepository;
+import com.assistance.DogShelter.db.model.DriveDirPicture;
+import com.assistance.DogShelter.db.model.Shelter;
+import com.assistance.DogShelter.db.repository.DriveDirPictureRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +16,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Optional;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 

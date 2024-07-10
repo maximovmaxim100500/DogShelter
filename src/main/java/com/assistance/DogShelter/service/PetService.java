@@ -1,34 +1,40 @@
 package com.assistance.DogShelter.service;
-import com.assistance.DogShelter.model.Pet;
-import com.assistance.DogShelter.repositories.PetRepository;
+
+import com.assistance.DogShelter.controller.dto.PetDto;
+import com.assistance.DogShelter.db.model.Pet;
+import com.assistance.DogShelter.db.repository.PetRepository;
+import com.assistance.DogShelter.mapper.PetMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Сервис для работы с питомцами.
  */
 @Service
 public class PetService {
-
     private final PetRepository petRepository;
-
+    private final PetMapper petMapper;
     @Autowired
-    public PetService(PetRepository petRepository) {
+    public PetService(PetRepository petRepository, PetMapper petMapper) {
         this.petRepository = petRepository;
+        this.petMapper = petMapper;
     }
+
 
     /**
      * Добавляет нового питомца.
      *
-     * @param pet Питомец для добавления.
+     * @param petDto Питомец для добавления.
      * @return Добавленный питомец.
      */
-    public Pet addPet(Pet pet) {
-        return petRepository.save(pet);
+    public PetDto addPet(PetDto petDto) {
+        Pet pet = petMapper.mapToPet(petDto);
+        Pet savedPet = petRepository.save(pet);
+        return petMapper.mapToPetDto(savedPet);
     }
 
     /**
@@ -37,18 +43,21 @@ public class PetService {
      * @param id Идентификатор питомца.
      * @return Питомец с указанным идентификатором, если найден.
      */
-    public Optional<Pet> findPetById(Long id) {
-        return petRepository.findById(id);
+    public Optional<PetDto> findPetById(Long id) {
+        Optional<Pet> pet = petRepository.findById(id);
+        return pet.map(petMapper::mapToPetDto);
     }
 
     /**
      * Обновляет данные питомца.
      *
-     * @param pet Питомец с обновленными данными.
+     * @param petDto Питомец с обновленными данными.
      * @return Обновленный питомец.
      */
-    public Pet editPet(Pet pet) {
-        return petRepository.save(pet);
+    public PetDto editPet(PetDto petDto) {
+        Pet pet = petMapper.mapToPet(petDto);
+        Pet updatedPet = petRepository.save(pet);
+        return petMapper.mapToPetDto(updatedPet);
     }
 
     /**
@@ -65,17 +74,21 @@ public class PetService {
      *
      * @return Список всех питомцев.
      */
-    public Collection<Pet> getAllPets() {
-        return petRepository.findAll();
+    public Collection<PetDto> getAllPets() {
+        return petRepository.findAll().stream()
+                .map(petMapper::mapToPetDto)
+                .collect(Collectors.toList());
     }
+
     /**
      * Возвращает список питомцев по идентификатору приюта.
      *
      * @param shelterId Идентификатор приюта.
      * @return Список питомцев приюта.
      */
-    public Collection<Pet> getPetsByShelterId(Long shelterId) {
-        return petRepository.findByShelterId(shelterId);
+    public Collection<PetDto> getPetsByShelterId(Long shelterId) {
+        return petRepository.findByShelterId(shelterId).stream()
+                .map(petMapper::mapToPetDto)
+                .collect(Collectors.toList());
     }
 }
-

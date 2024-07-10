@@ -1,6 +1,6 @@
 package com.assistance.DogShelter.controller;
 
-import com.assistance.DogShelter.model.Report;
+import com.assistance.DogShelter.db.model.Report;
 import com.assistance.DogShelter.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

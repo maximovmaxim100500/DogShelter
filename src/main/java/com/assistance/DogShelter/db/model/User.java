@@ -1,4 +1,4 @@
-package com.assistance.DogShelter.model;
+package com.assistance.DogShelter.db.model;
 
 // Модель, представляющая пользователя
 
@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**

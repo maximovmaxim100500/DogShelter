@@ -1,6 +1,6 @@
-package com.assistance.DogShelter.repositories;
+package com.assistance.DogShelter.db.repository;
 
-import com.assistance.DogShelter.model.Pet;
+import com.assistance.DogShelter.db.model.Pet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
