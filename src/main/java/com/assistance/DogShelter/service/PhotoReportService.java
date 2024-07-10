@@ -1,7 +1,7 @@
 package com.assistance.DogShelter.service;
 
-import com.assistance.DogShelter.model.PhotoReport;
-import com.assistance.DogShelter.repositories.PhotoReportRepository;
+import com.assistance.DogShelter.db.model.PhotoReport;
+import com.assistance.DogShelter.db.repository.PhotoReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

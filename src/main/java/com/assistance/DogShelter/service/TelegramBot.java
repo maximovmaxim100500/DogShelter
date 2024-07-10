@@ -1,8 +1,9 @@
 package com.assistance.DogShelter.service;
 
 import com.assistance.DogShelter.config.BotConfig;
-import com.assistance.DogShelter.model.Pet;
-import com.assistance.DogShelter.model.Shelter;
+import com.assistance.DogShelter.controller.dto.PetDto;
+import com.assistance.DogShelter.db.model.Pet;
+import com.assistance.DogShelter.db.model.Shelter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -142,16 +143,18 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
     public void showPets(long chatId, long shelterId) {
-        // Логика получения питомцев из базы данных по shelterId и отправка сообщений в Telegram
-        List<Pet> pets = (List<Pet>) petService.getPetsByShelterId(shelterId);
+        // Получение списка питомцев из базы данных по shelterId
+        List<PetDto> pets = (List<PetDto>) petService.getPetsByShelterId(shelterId);
         StringBuilder petsInfo = new StringBuilder("Наши питомцы:\n");
 
-        for (Pet pet : pets) {
+        // Проход по каждому питомцу и добавление информации о нем в строку сообщения
+        for (PetDto pet : pets) {
             petsInfo.append("Имя: ").append(pet.getName()).append("\n")
                     .append("Порода: ").append(pet.getBreed()).append("\n")
                     .append("Возраст: ").append(pet.getAge()).append("\n\n");
         }
 
+        // Отправка сообщения в Telegram
         sendMessage(chatId, petsInfo.toString());
     }
     public void showDirection(long chatId) {

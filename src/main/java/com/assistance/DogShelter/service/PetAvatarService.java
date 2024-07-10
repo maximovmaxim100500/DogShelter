@@ -1,7 +1,7 @@
 package com.assistance.DogShelter.service;
 
-import com.assistance.DogShelter.model.PetAvatar;
-import com.assistance.DogShelter.repositories.PetAvatarRepository;
+import com.assistance.DogShelter.db.model.PetAvatar;
+import com.assistance.DogShelter.db.repository.PetAvatarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

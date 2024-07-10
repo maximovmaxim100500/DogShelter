@@ -1,9 +1,10 @@
 package com.assistance.DogShelter.controller;
 
-import com.assistance.DogShelter.model.Pet;
+import com.assistance.DogShelter.controller.dto.PetDto;
 import com.assistance.DogShelter.service.PetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +21,7 @@ import java.util.Optional;
 public class PetController {
 
     private final PetService petService;
-
-    /**
-     * Конструктор контроллера, который принимает сервис для работы с питомцем.
-     *
-     * @param petService Сервис для работы с питомцем.
-     */
+    @Autowired
     public PetController(PetService petService) {
         this.petService = petService;
     }
@@ -33,7 +29,7 @@ public class PetController {
     /**
      * Обрабатывает POST-запрос для добавления нового питомца.
      *
-     * @param pet Переданный питомец в теле запроса.
+     * @param petDto Переданный питомец в теле запроса.
      * @return Питомец, который был добавлен с помощью сервиса.
      */
     @PostMapping("/add")
@@ -43,8 +39,8 @@ public class PetController {
                     @ApiResponse(responseCode = "201", description = "Successfully created"),
                     @ApiResponse(responseCode = "400", description = "Invalid request")
             })
-    public ResponseEntity<Pet> addPet(@RequestBody Pet pet) {
-        Pet addPet = petService.addPet(pet);
+    public ResponseEntity<PetDto> addPet(@RequestBody PetDto petDto) {
+        PetDto addPet = petService.addPet(petDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(addPet);
     }
 
@@ -62,8 +58,8 @@ public class PetController {
                     @ApiResponse(responseCode = "400", description = "Invalid request"),
                     @ApiResponse(responseCode = "404", description = "Pet not found")
             })
-    public ResponseEntity<Pet> findPetById(@PathVariable Long id) {
-        Optional<Pet> pet = petService.findPetById(id);
+    public ResponseEntity<PetDto> findPetById(@PathVariable Long id) {
+        Optional<PetDto> pet = petService.findPetById(id);
         return pet.map(value -> ResponseEntity.status(HttpStatus.OK).body(value))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
@@ -71,7 +67,7 @@ public class PetController {
     /**
      * Обрабатывает PUT-запрос для редактирования питомца.
      *
-     * @param pet Питомец с обновленными данными в теле запроса.
+     * @param petDto Питомец с обновленными данными в теле запроса.
      * @param id  Идентификатор редактируемого питомца.
      * @return Обновленный питомец, если редактирование выполнено успешно, в противном случаи возвращает 404 ошибку.
      */
@@ -83,10 +79,11 @@ public class PetController {
                     @ApiResponse(responseCode = "400", description = "Invalid request"),
                     @ApiResponse(responseCode = "404", description = "Pet not found")
             })
-    public ResponseEntity<Pet> editPet(@RequestBody Pet pet, @PathVariable Long id) {
-        Optional<Pet> foundPet = petService.findPetById(id);
+    public ResponseEntity<PetDto> editPet(@RequestBody PetDto petDto, @PathVariable Long id) {
+        Optional<PetDto> foundPet = petService.findPetById(id);
         if (foundPet.isPresent()) {
-            Pet updatedPet = petService.editPet(pet);
+            petDto.setId(id); // Убедитесь, что ID установлен для обновления
+            PetDto updatedPet = petService.editPet(petDto);
             return ResponseEntity.status(HttpStatus.OK).body(updatedPet);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -126,7 +123,7 @@ public class PetController {
                     @ApiResponse(responseCode = "200", description = "Success"),
                     @ApiResponse(responseCode = "400", description = "Invalid request")
             })
-    public ResponseEntity<Collection<Pet>> getAllPets() {
+    public ResponseEntity<Collection<PetDto>> getAllPets() {
         return ResponseEntity.ok(petService.getAllPets());
     }
 }

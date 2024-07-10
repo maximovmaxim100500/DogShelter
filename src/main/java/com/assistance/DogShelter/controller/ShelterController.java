@@ -1,15 +1,16 @@
 package com.assistance.DogShelter.controller;
 
-import com.assistance.DogShelter.model.Shelter;
+import com.assistance.DogShelter.controller.dto.ShelterDto;
+import com.assistance.DogShelter.db.model.Shelter;
 import com.assistance.DogShelter.service.ShelterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Контроллер для обработки HTTP-запросов, связанных с приютами.
@@ -20,7 +21,7 @@ import java.util.Optional;
 public class ShelterController {
 
     private final ShelterService shelterService;
-
+    @Autowired
     public ShelterController(ShelterService shelterService) {
         this.shelterService = shelterService;
     }
@@ -28,7 +29,7 @@ public class ShelterController {
     /**
      * Обрабатывает POST-запрос для добавления нового приюта.
      *
-     * @param shelter Переданный приют в теле запроса.
+     * @param shelterDto Переданный приют в теле запроса.
      * @return Приют, который был добавлен с помощью сервиса.
      */
     @PostMapping("/add")
@@ -38,8 +39,8 @@ public class ShelterController {
                     @ApiResponse(responseCode = "201", description = "Successfully created"),
                     @ApiResponse(responseCode = "400", description = "Invalid request")
             })
-    public ResponseEntity<Shelter> addShelter(@RequestBody Shelter shelter) {
-        Shelter addedShelter = shelterService.addShelter(shelter);
+    public ResponseEntity<ShelterDto> addShelter(@RequestBody ShelterDto shelterDto) {
+        ShelterDto addedShelter = shelterService.addShelter(shelterDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedShelter);
     }
 
@@ -122,7 +123,7 @@ public class ShelterController {
                     @ApiResponse(responseCode = "200", description = "Success"),
                     @ApiResponse(responseCode = "400", description = "Invalid request")
             })
-    public List<Shelter> getAllShelters() {
+    public List<ShelterDto> getAllShelters() {
         return shelterService.getAllShelters();
     }
 }

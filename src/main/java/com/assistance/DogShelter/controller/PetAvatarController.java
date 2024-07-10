@@ -1,5 +1,5 @@
 package com.assistance.DogShelter.controller;
-import com.assistance.DogShelter.model.PetAvatar;
+import com.assistance.DogShelter.db.model.PetAvatar;
 import com.assistance.DogShelter.service.PetAvatarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
