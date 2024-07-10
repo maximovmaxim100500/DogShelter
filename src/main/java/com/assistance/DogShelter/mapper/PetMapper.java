@@ -17,7 +17,6 @@ public class PetMapper {
                 .age(pet.getAge())
                 .food(pet.getFood())
                 .user(pet.getUser())
-                .shelter(pet.getShelter())
                 .build();
     }
 
@@ -35,7 +34,6 @@ public class PetMapper {
         pet.setAge(petDto.getAge());
         pet.setFood(petDto.getFood());
         pet.setUser(petDto.getUser());
-        pet.setShelter(petDto.getShelter());
         return pet;
     }
 }

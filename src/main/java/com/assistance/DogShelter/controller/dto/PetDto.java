@@ -14,5 +14,5 @@ public class PetDto {
     private int age;            // возраст питомца
     private String food;        // предпочитаемая еда питомца
     private User user;          // связать с классом User
-    private Shelter shelter;    // убрали Shelter, не хотим рекурсию
+    // убрали Shelter, не хотим рекурсию
 }

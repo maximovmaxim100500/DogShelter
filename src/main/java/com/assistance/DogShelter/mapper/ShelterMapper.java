@@ -44,7 +44,6 @@ public class ShelterMapper {
         shelter.setId(shelterDto.getId());
         shelter.setName(shelterDto.getName());
         shelter.setAddress(shelterDto.getAddress());
-        // Преобразование списка PetDto в Set<Pet> следует сделать здесь, если это необходимо
         return shelter;
     }
 }
