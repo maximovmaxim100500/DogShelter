@@ -33,6 +33,15 @@ public class VolunteerRegistrationService {
         }
     }
 
+    public void registerVolunteer(long chatId) {
+        TelegramBot bot = applicationContext.getBean(TelegramBot.class);
+        if (volunteerRepository.findByChatId(chatId).isPresent()) {
+            bot.sendMessage(chatId, "Вы уже зарегистрированы как волонтер.");
+        } else {
+            askForName(chatId);
+        }
+    }
+
     private void askForName(long chatId) {
         TelegramBot bot = applicationContext.getBean(TelegramBot.class);
         bot.sendMessage(chatId, "Пожалуйста, введите ваше имя:");

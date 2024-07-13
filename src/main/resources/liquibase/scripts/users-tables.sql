@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS users (
 -- tableExists tableName: reports
 
 -- Создание колонки для связи между пользователями и их отчетами
-ALTER TABLE users
-    ADD COLUMN report_id BIGSERIAL,                 --Идентификатор отчета, ссылка на таблицу reports
-    ADD CONSTRAINT FK_report_id
-        FOREIGN KEY (report_id)
-        REFERENCES reports(id);
+--ALTER TABLE users
+--    ADD COLUMN report_id BIGSERIAL,                 --Идентификатор отчета, ссылка на таблицу reports
+--    ADD CONSTRAINT FK_report_id
+--        FOREIGN KEY (report_id)
+--        REFERENCES reports(id);

@@ -64,10 +64,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            textMessageHandler.handleTextMessage(update);
-        } else if (update.hasCallbackQuery()) {
+        if (update.hasCallbackQuery()) {
             callBackQueryHandler.handleCallbackQuery(update);
+        } else {
+            textMessageHandler.handleTextMessage(update);
         }
     }
 
@@ -142,6 +142,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             log.error("Ошибка при отправке меню информации о приюте: " + e.getMessage(), e);
         }
     }
+
     public void showPets(long chatId, long shelterId) {
         // Получение списка питомцев из базы данных по shelterId
         List<PetDto> pets = (List<PetDto>) petService.getPetsByShelterId(shelterId);
@@ -157,6 +158,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         // Отправка сообщения в Telegram
         sendMessage(chatId, petsInfo.toString());
     }
+
     public void showDirection(long chatId) {
         // Логика получения адреса из базы данных по shelterId и отправка сообщений в Telegram
         Shelter shelter = shelterService.findShelterById(1L);
@@ -359,7 +361,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         InlineKeyboardButton buttonMenu3 = new InlineKeyboardButton("Рекомендации");
         buttonMenu3.setCallbackData("Recommendations");
-      
+
         InlineKeyboardButton buttonMenu4 = new InlineKeyboardButton("Дополнительно");
         buttonMenu4.setCallbackData("More");
 

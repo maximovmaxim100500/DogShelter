@@ -79,3 +79,10 @@ databaseChangeLog:
       changes:
         - sqlFile:
             path: liquibase/scripts/pets-tables-column-user-id.sql
+
+  - changeSet:
+      id: 12
+      author: dkhan
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/reports-tables-column-user-id.sql

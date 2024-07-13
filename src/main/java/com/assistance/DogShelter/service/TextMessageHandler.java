@@ -14,6 +14,9 @@ public class TextMessageHandler {
     private VolunteerRegistrationService volunteerRegistrationService;
 
     @Autowired
+    private ReportSendFormService reportSendFormService;
+
+    @Autowired
     private ApplicationContext applicationContext;
 
     public void handleTextMessage(Update update) {
@@ -28,18 +31,23 @@ public class TextMessageHandler {
                     bot.startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
                     break;
                 case "/help":
-                    bot.sendMessage(chatId, "Список доступных команд:\n/start - Начать работу с ботом (меню)\n/register_volunteer - Регистрация волонтера\n/help - Список команд");
+                    bot.sendMessage(chatId, "Список доступных команд:" +
+                            "\n/start - Начать работу с ботом (меню)" +
+                            "\n/register_volunteer - Регистрация волонтера" +
+                            "\n/help - Список команд");
                     break;
                 case "/register_volunteer":
                     volunteerRegistrationService.registerVolunteer(update);
                     break;
                 default:
                     // Обработка других текстовых сообщений
-                    volunteerRegistrationService.handleTextMessage(update);
+                    //volunteerRegistrationService.handleTextMessage(update);
+                    reportSendFormService.handleTextMessage(update);
                     break;
             }
-        } else {
+        } else if (update.hasMessage() && update.getMessage().hasPhoto()) {
             // Если сообщение не текстовое, можно добавить другую обработку
+            reportSendFormService.handleTextMessage(update);
             log.info("Получено не текстовое сообщение: " + update);
         }
     }
