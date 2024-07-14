@@ -1,113 +1,161 @@
 package com.assistance.DogShelter.controller;
 
+import com.assistance.DogShelter.controller.dto.PetDto;
+import com.assistance.DogShelter.controller.dto.ShelterDto;
 import com.assistance.DogShelter.db.model.User;
+import com.assistance.DogShelter.db.repository.PetRepository;
+import com.assistance.DogShelter.db.repository.ShelterRepository;
+import com.assistance.DogShelter.mapper.PetMapper;
+import com.assistance.DogShelter.mapper.ShelterMapper;
+import com.assistance.DogShelter.service.PetService;
+import com.assistance.DogShelter.service.ShelterService;
 import com.assistance.DogShelter.service.UserService;
+import jakarta.ws.rs.core.MediaType;
+import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@WebMvcTest(UserController.class)
+@WebMvcTest(ShelterController.class)
 class MVCShelterControllerTest {
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
-    private UserService userService;
-
+    private ShelterRepository shelterRepository;
+    @MockBean
+    private ShelterMapper shelterMapper;
+    @MockBean
+    private ShelterService shelterService;
     @Autowired
-    private User user;
+    private ShelterController shelterController;
 
-    @BeforeEach
-    void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setName("Jane Doe");
-        user.setChatId(123456L);
-        user.setPhoneNumber("123-456-7890");
-        // установите другие свойства пользователя по необходимости
+    @Test
+    public void getPetByIdTest() throws Exception {
+        Long id = 1L;
+        String name = "Приют1";
+        String address = "г. Москва, ул. Пушкина, д.10";
+
+        ShelterDto expectedShelter = new ShelterDto();
+        expectedShelter.setId(id);
+        expectedShelter.setName(name);
+        expectedShelter.setAddress(address);
+
+
+        when(shelterService.findShelterById(id)).thenReturn(Optional.of(expectedShelter));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/shelters/{id}", id)
+                        .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
+                        .accept(jakarta.ws.rs.core.MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.address").value(address));
     }
 
     @Test
-    void testAddUser() throws Exception {
-        Mockito.when(userService.addUser(any(User.class))).thenReturn(user);
+    void getAllSheltersTest() throws Exception {
+        List<ShelterDto> shelters = Arrays.asList(
+                new ShelterDto(1L, "Приют1", "г. Москва, ул. Пушкина, д.10", null),
+                new ShelterDto(2L, "Приют2", "г. Санкт-Петербург, ул. Ленина, д.15", null)
+        );
+        when(shelterService.getAllShelters()).thenReturn(shelters);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/users/add")
+        mockMvc.perform(get("/shelters/all")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Jane Doe\", \"chatId\": 123456, \"phoneNumber\": \"123-456-7890\"}")) // обновите JSON в соответствии с вашим объектом User
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    public void createShelterTest() throws Exception {
+        Long id = 1L;
+        String name = "Приют1";
+        String address = "г. Москва, ул. Пушкина, д.10";
+
+        JSONObject shelterObject = new JSONObject();
+        shelterObject.put("name", name);
+        shelterObject.put("address", address);
+
+        ShelterDto newShelter = new ShelterDto();
+        newShelter.setId(id);
+        newShelter.setName(name);
+        newShelter.setAddress(address);
+
+        when(shelterService.addShelter(any(ShelterDto.class))).thenReturn(newShelter);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/shelters/add")
+                        .content(shelterObject.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("Jane Doe"))
-                .andExpect(jsonPath("$.chatId").value(123456L))
-                .andExpect(jsonPath("$.phoneNumber").value("123-456-7890"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id.intValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.address").value(address));
     }
 
     @Test
-    void testFindUserById() throws Exception {
-        Mockito.when(userService.findUserById(anyLong())).thenReturn(Optional.of(user));
+    public void deleteShelterTest() throws Exception {
+        Long id = 1L;
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("Jane Doe"))
-                .andExpect(jsonPath("$.chatId").value(123456L))
-                .andExpect(jsonPath("$.phoneNumber").value("123-456-7890"));
-    }
+        doNothing().when(shelterService).deleteShelter(id);
 
-    @Test
-    void testEditUser() throws Exception {
-        Mockito.when(userService.findUserById(anyLong())).thenReturn(Optional.of(user));
-        Mockito.when(userService.editUser(any(User.class))).thenReturn(user);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+        mockMvc.perform(MockMvcRequestBuilders
+                        .delete("/shelters/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Jane Doe\", \"chatId\": 123456, \"phoneNumber\": \"123-456-7890\"}")) // обновите JSON в соответствии с вашим объектом User
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("Jane Doe"))
-                .andExpect(jsonPath("$.chatId").value(123456L))
-                .andExpect(jsonPath("$.phoneNumber").value("123-456-7890"));
-    }
-
-    @Test
-    void testDeleteUser() throws Exception {
-        Mockito.when(userService.findUserById(anyLong())).thenReturn(Optional.of(user));
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/users/1"))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void testDeleteUserByChatId() throws Exception {
-        Mockito.when(userService.findUserByChatId(anyLong())).thenReturn(Optional.of(user));
+    public void editShelterTest() throws Exception {
+        Long id = 1L;
+        String name = "Приют1";
+        String address = "г. Москва, ул. Пушкина, д.10";
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/users/chatId/123456"))
-                .andExpect(status().isOk());
-    }
+        JSONObject shelterObject = new JSONObject();
+        shelterObject.put("name", name);
+        shelterObject.put("address", address);
 
-    @Test
-    void testGetAllUsers() throws Exception {
-        Mockito.when(userService.getAllUsers()).thenReturn(Arrays.asList(user));
+        ShelterDto updatedShelter = new ShelterDto();
+        updatedShelter.setId(id);
+        updatedShelter.setName(name);
+        updatedShelter.setAddress(address);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/all"))
+        when(shelterService.findShelterById(id)).thenReturn(Optional.of(updatedShelter));
+        when(shelterService.editShelter(any(ShelterDto.class))).thenReturn(updatedShelter);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/shelters/{id}", id)
+                        .content(shelterObject.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].name").value("Jane Doe"))
-                .andExpect(jsonPath("$[0].chatId").value(123456L))
-                .andExpect(jsonPath("$[0].phoneNumber").value("123-456-7890"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id.intValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.address").value(address));
     }
 }

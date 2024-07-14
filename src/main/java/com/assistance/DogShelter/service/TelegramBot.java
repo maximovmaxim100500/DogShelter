@@ -2,6 +2,7 @@ package com.assistance.DogShelter.service;
 
 import com.assistance.DogShelter.config.BotConfig;
 import com.assistance.DogShelter.controller.dto.PetDto;
+import com.assistance.DogShelter.controller.dto.ShelterDto;
 import com.assistance.DogShelter.db.model.Pet;
 import com.assistance.DogShelter.db.model.Shelter;
 import lombok.extern.slf4j.Slf4j;
@@ -159,9 +160,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
     public void showDirection(long chatId) {
         // Логика получения адреса из базы данных по shelterId и отправка сообщений в Telegram
-        Shelter shelter = shelterService.findShelterById(1L);
-        if (shelter != null) {
-            sendMessage(chatId, "Адрес приюта:\n" + shelter.getAddress());
+        Optional<ShelterDto> shelterDto = shelterService.findShelterById(1L);
+        if (shelterDto.isPresent()) {
+            sendMessage(chatId, "Адрес приюта:\n" + shelterDto.get().getAddress());
         } else {
             sendMessage(chatId, "К сожалению, не удалось найти приют с указанным идентификатором.");
         }
