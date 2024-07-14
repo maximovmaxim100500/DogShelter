@@ -1,9 +1,9 @@
 package com.assistance.DogShelter.notification;
 
-import com.assistance.DogShelter.model.Pet;
-import com.assistance.DogShelter.model.User;
-import com.assistance.DogShelter.repositories.PetRepository;
-import com.assistance.DogShelter.repositories.UserRepository;
+import com.assistance.DogShelter.db.model.Pet;
+import com.assistance.DogShelter.db.model.User;
+import com.assistance.DogShelter.db.repository.PetRepository;
+import com.assistance.DogShelter.db.repository.UserRepository;
 import com.assistance.DogShelter.service.TelegramBot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
