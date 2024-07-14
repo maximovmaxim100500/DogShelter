@@ -3,12 +3,11 @@ package com.assistance.DogShelter.controller;
 import com.assistance.DogShelter.controller.dto.PetDto;
 ;
 import com.assistance.DogShelter.db.repository.PetRepository;
+import com.assistance.DogShelter.mapper.PetMapper;
 import com.assistance.DogShelter.service.PetService;
 import jakarta.ws.rs.core.MediaType;
 import net.minidev.json.JSONObject;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,10 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,10 +35,11 @@ class MVCPetControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private PetRepository petRepository;
-    @SpyBean
+    @MockBean
+    private PetMapper petMapper;
+    @MockBean
     private PetService petService;
-
-    @InjectMocks
+    @Autowired
     private PetController petController;
 
     @Test
@@ -88,7 +87,6 @@ class MVCPetControllerTest {
     }
 
     @Test
-    @Disabled
     public void createPetTest() throws Exception {
         Long id = 1L;
         String name = "Дружок";
@@ -97,8 +95,8 @@ class MVCPetControllerTest {
         String food = "Сухой корм";
 
         JSONObject petObject = new JSONObject();
-        petObject.put("id", id);
         petObject.put("name", name);
+        petObject.put("breed", breed);
         petObject.put("age", age);
         petObject.put("food", food);
 
@@ -109,39 +107,32 @@ class MVCPetControllerTest {
         newPet.setAge(age);
         newPet.setFood(food);
 
-//        when()
+        when(petService.addPet(any(PetDto.class))).thenReturn(newPet);
 
-//        when(petService.addPet(any(PetDto.class))).thenReturn(newPet);
-//
-//        mockMvc.perform(MockMvcRequestBuilders
-//                        .post("/pets")
-//                        .content("{\"name\":\"Дружок\",\"breed\":\"Лабрадор\",\"age\":3,\"food\":\"Сухой корм\"}")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.breed").value(breed))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.age").value(age))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.food").value(food));
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/pets/add")
+                        .content(petObject.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id.intValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.breed").value(breed))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.age").value(age))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.food").value(food));
     }
 
     @Test
     public void deletePetTest() throws Exception {
         Long id = 1L;
-        String name = "Дружок";
-        String breed = "Лабрадор";
-        int age = 3;
-        String food = "Сухой корм";
 
-        PetDto petToDelete = new PetDto();
-        petToDelete.setId(id);
-        petToDelete.setName(name);
-        petToDelete.setBreed(breed);
-        petToDelete.setAge(age);
-        petToDelete.setFood(food);
-
+        // Настройка моков
+        PetDto mockPet = new PetDto();
+        mockPet.setId(id);
+        when(petService.findPetById(id)).thenReturn(Optional.of(mockPet));
         doNothing().when(petService).deletePet(id);
 
+        // Вызов и проверка
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/pets/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -162,10 +153,53 @@ class MVCPetControllerTest {
         expectedPet.setBreed(breed);
         expectedPet.setAge(age);
 
-        mockMvc.perform(get("/pets/{id}", id)
+        when(petService.findPetById(id)).thenReturn(Optional.of(expectedPet));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/pets/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id.intValue())); // Проверка на соответствие идентификатора питомца
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id.intValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.breed").value(breed))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.age").value(age));
+    }
+
+    @Test
+    public void editPetTest() throws Exception {
+        Long id = 1L;
+        String name = "Дружок";
+        String breed = "Лабрадор";
+        int age = 3;
+        String food = "Сухой корм";
+
+        JSONObject petObject = new JSONObject();
+        petObject.put("name", name);
+        petObject.put("breed", breed);
+        petObject.put("age", age);
+        petObject.put("food", food);
+
+        PetDto updatedPet = new PetDto();
+        updatedPet.setId(id);
+        updatedPet.setName(name);
+        updatedPet.setBreed(breed);
+        updatedPet.setAge(age);
+        updatedPet.setFood(food);
+
+        when(petService.findPetById(id)).thenReturn(Optional.of(updatedPet));
+        when(petService.editPet(any(PetDto.class))).thenReturn(updatedPet);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/pets/{id}", id)
+                        .content(petObject.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id.intValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.breed").value(breed))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.age").value(age))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.food").value(food));
     }
 }

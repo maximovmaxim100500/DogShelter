@@ -29,6 +29,7 @@ class MVCShelterControllerTest {
     @MockBean
     private UserService userService;
 
+    @Autowired
     private User user;
 
     @BeforeEach

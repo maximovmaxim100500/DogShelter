@@ -29,7 +29,7 @@ class MVCVolunteerControllerTest {
 
     @MockBean
     private VolunteerService volunteerService;
-
+    @Autowired
     private Volunteer volunteer;
 
     @BeforeEach

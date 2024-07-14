@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @MockBean
     private UserService userService;
 
+    @Autowired
     private User user;
 
     @BeforeEach
