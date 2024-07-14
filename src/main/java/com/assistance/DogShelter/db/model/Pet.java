@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 /**
  * Модель, представляющая питомца.
  */
@@ -37,4 +39,7 @@ public class Pet {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shelter_id", nullable = false)
     private Shelter shelter;    // связать с классом Shelter
+
+    @Column(name = "date_adoption")       // дата усыновления
+    private LocalDate dateAdoption;
 }

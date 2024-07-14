@@ -30,3 +30,5 @@ ALTER TABLE users
     ADD CONSTRAINT FK_report_id
         FOREIGN KEY (report_id)
         REFERENCES reports(id);
+
+
