@@ -1,26 +1,24 @@
 package com.assistance.DogShelter.controller;
-
 import com.assistance.DogShelter.db.model.Volunteer;
 import com.assistance.DogShelter.service.VolunteerService;
-import org.junit.jupiter.api.BeforeEach;
+import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(VolunteerController.class)
 class MVCVolunteerControllerTest {
@@ -29,86 +27,138 @@ class MVCVolunteerControllerTest {
 
     @MockBean
     private VolunteerService volunteerService;
-    @Autowired
-    private Volunteer volunteer;
-
-    @BeforeEach
-    void setUp() {
-        volunteer = new Volunteer();
-        volunteer.setId(1L);
-        volunteer.setName("John Doe");
-    }
 
     @Test
-    void testAddVolunteer() throws Exception {
-        Mockito.when(volunteerService.addVolunteer(any(Volunteer.class))).thenReturn(volunteer);
+    public void addVolunteerTest() throws Exception {
+        Long id = 1L;
+        Long chatId = 123456789L;
+        String name = "Анна Ананьева";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/volunteers/add")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"John Doe\"}"))
+        JSONObject volunteerObject = new JSONObject();
+        volunteerObject.put("chatId", chatId);
+        volunteerObject.put("name", name);
+        volunteerObject.put("isBusy", false);
+
+        Volunteer newVolunteer = new Volunteer(id, chatId, name, false);
+
+        when(volunteerService.addVolunteer(any(Volunteer.class))).thenReturn(newVolunteer);
+
+        mockMvc.perform(post("/volunteers/add")
+                        .content(volunteerObject.toString())
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .accept(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("John Doe"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id.intValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.chatId").value(chatId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.isBusy").value(false));
     }
 
     @Test
-    void testFindVolunteerById() throws Exception {
-        Mockito.when(volunteerService.findVolunteerById(anyLong())).thenReturn(Optional.of(volunteer));
+    public void findVolunteerByIdTest() throws Exception {
+        Long id = 1L;
+        Long chatId = 123456789L;
+        String name = "Анна Ананьева";
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/volunteers/1"))
+        Volunteer expectedVolunteer = new Volunteer(id, chatId, name, false);
+
+        when(volunteerService.findVolunteerById(id)).thenReturn(Optional.of(expectedVolunteer));
+
+        mockMvc.perform(get("/volunteers/{id}", id)
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .accept(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("John Doe"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id.intValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.chatId").value(chatId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.isBusy").value(false));
     }
 
     @Test
-    void testEditVolunteer() throws Exception {
-        Mockito.when(volunteerService.findVolunteerById(anyLong())).thenReturn(Optional.of(volunteer));
-        Mockito.when(volunteerService.editVolunteer(any(Volunteer.class))).thenReturn(volunteer);
+    public void editVolunteerTest() throws Exception {
+        Long id = 1L;
+        Long chatId = 123456789L;
+        String name = "Анна Ананьева";
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/volunteers/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"John Doe\"}"))
+        JSONObject volunteerObject = new JSONObject();
+        volunteerObject.put("chatId", chatId);
+        volunteerObject.put("name", name);
+        volunteerObject.put("isBusy", false);
+
+        Volunteer updatedVolunteer = new Volunteer(id, chatId, name, false);
+
+        when(volunteerService.findVolunteerById(id)).thenReturn(Optional.of(updatedVolunteer));
+        when(volunteerService.editVolunteer(any(Volunteer.class))).thenReturn(updatedVolunteer);
+
+        mockMvc.perform(put("/volunteers/{id}", id)
+                        .content(volunteerObject.toString())
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .accept(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("John Doe"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id.intValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.chatId").value(chatId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(name))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.isBusy").value(false));
     }
 
     @Test
-    void testSetVolunteerBusy() throws Exception {
-        Mockito.when(volunteerService.findVolunteerById(anyLong())).thenReturn(Optional.of(volunteer));
-        Mockito.when(volunteerService.keepVolunteerBusy(anyLong(), any(Boolean.class))).thenReturn(volunteer);
+    public void deleteVolunteerTest() throws Exception {
+        Long id = 1L;
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/volunteers/1")
-                        .param("busy", "true"))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("John Doe"));
-    }
+        when(volunteerService.findVolunteerById(id)).thenReturn(Optional.of(new Volunteer()));
+        doNothing().when(volunteerService).deleteVolunteer(id);
 
-    @Test
-    void testDeleteVolunteer() throws Exception {
-        Mockito.when(volunteerService.findVolunteerById(anyLong())).thenReturn(Optional.of(volunteer));
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/volunteers/1"))
+        mockMvc.perform(delete("/volunteers/{id}", id)
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .accept(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void testDeleteVolunteerByChatId() throws Exception {
-        Mockito.when(volunteerService.findVolunteerByChatId(anyLong())).thenReturn(Optional.of(volunteer));
+    public void deleteVolunteerByChatIdTest() throws Exception {
+        Long chatId = 123456789L;
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/volunteers/chatId/12345"))
+        when(volunteerService.findVolunteerByChatId(chatId)).thenReturn(Optional.of(new Volunteer()));
+        doNothing().when(volunteerService).deleteVolunteerChatId(chatId);
+
+        mockMvc.perform(delete("/volunteers/chatId/{chatId}", chatId)
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .accept(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void testGetAllVolunteers() throws Exception {
-        Mockito.when(volunteerService.getAllVolunteers()).thenReturn(Arrays.asList(volunteer));
+    public void setVolunteerBusyTest() throws Exception {
+        Long id = 1L;
+        boolean busy = true;
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/volunteers/all"))
+        Volunteer volunteer = new Volunteer(id, 123456789L, "Анна Ананьева", !busy);
+
+        when(volunteerService.findVolunteerById(id)).thenReturn(Optional.of(volunteer));
+        when(volunteerService.keepVolunteerBusy(id, busy)).thenReturn(new Volunteer(id, 123456789L, "Анна Ананьева", busy));
+
+        mockMvc.perform(post("/volunteers/{userId}", id)
+                        .param("busy", String.valueOf(busy))
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .accept(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("John Doe"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id.intValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.isBusy").value(busy));
+    }
+
+    @Test
+    public void getAllVolunteersTest() throws Exception {
+        List<Volunteer> volunteers = Arrays.asList(
+                new Volunteer(1L, 123456789L, "Анна Ананьева", false),
+                new Volunteer(2L, 987654321L, "Петр Петров", false)
+        );
+
+        when(volunteerService.getAllVolunteers()).thenReturn(volunteers);
+
+        mockMvc.perform(get("/volunteers/all")
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .accept(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2))); // Проверяем, что вернулась коллекция из двух волонтеров
     }
 }

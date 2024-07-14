@@ -2,6 +2,7 @@ package com.assistance.DogShelter.db.model;
 
 // Модель, представляющая волонтера
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,5 +28,6 @@ public class Volunteer {
     @Column(name = "name", nullable = false)
     private String name;          // имя волонтера
     @Column(name = "is_busy", nullable = false)
+    @JsonProperty("isBusy")
     private boolean isBusy;       //статус волонтёра (занят)
 }

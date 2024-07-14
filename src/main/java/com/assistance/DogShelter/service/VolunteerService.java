@@ -27,6 +27,7 @@ public class VolunteerService {
      * @return Volunteer
      */
     public Volunteer addVolunteer(Volunteer volunteer) {
+        volunteer.setBusy(false);
         return volunteerRepository.save(volunteer);
     }
 
