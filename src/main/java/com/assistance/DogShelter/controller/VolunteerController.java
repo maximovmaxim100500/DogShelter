@@ -4,6 +4,7 @@ import com.assistance.DogShelter.db.model.Volunteer;
 import com.assistance.DogShelter.service.VolunteerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/volunteers")
+@Slf4j
 public class VolunteerController {
 
 
@@ -45,8 +47,9 @@ public class VolunteerController {
                     @ApiResponse(responseCode = "400", description = "Invalid request")
             })
     public ResponseEntity<Volunteer> addVolunteer(@RequestBody Volunteer volunteer) {
-        Volunteer addVolunteer = volunteerService.addVolunteer(volunteer);
-        return ResponseEntity.status(HttpStatus.CREATED).body(volunteer);
+        Volunteer addedVolunteer = volunteerService.addVolunteer(volunteer);
+        log.info("Added Volunteer: {}", addedVolunteer); // Логгирование добавленного волонтера
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedVolunteer);
     }
 
     /**

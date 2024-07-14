@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,7 +31,7 @@ import java.util.Optional;
 public class PetAvatarController {
 
     private final PetAvatarService petAvatarService;
-
+    @Autowired
     public PetAvatarController(PetAvatarService petAvatarService) {
         this.petAvatarService = petAvatarService;
     }

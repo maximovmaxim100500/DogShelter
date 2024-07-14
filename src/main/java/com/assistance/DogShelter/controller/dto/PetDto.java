@@ -1,11 +1,14 @@
 package com.assistance.DogShelter.controller.dto;
 
-import com.assistance.DogShelter.db.model.Shelter;
 import com.assistance.DogShelter.db.model.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class PetDto {
     private long id;            // id питомца
