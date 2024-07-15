@@ -59,8 +59,8 @@ class MVCUserControllerTest {
     void getAllUsersTest() throws Exception {
         // Создаем и сохраняем пользователей в сервисе или базе данных
         List<User> users = Arrays.asList(
-                new User(1L, 12345778L, "Иван Иванов", "8-800-600-30-05", null, null),
-                new User(2L, 12435778L, "Петр Петров", "8-800-500-30-05", null, null)
+                new User(1L, 12345778L, "Иван Иванов", "8-800-600-30-05", null, null, false),
+                new User(2L, 12435778L, "Петр Петров", "8-800-500-30-05", null, null, false)
         );
         when(userService.getAllUsers()).thenReturn(users);
 

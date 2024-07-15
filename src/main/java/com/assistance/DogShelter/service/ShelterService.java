@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Сервис для работы с приютами.
@@ -76,8 +77,9 @@ public class ShelterService {
      * @return Список всех приютов.
      */
     public List<ShelterDto> getAllShelters() {
-        List<Shelter> all = shelterRepository.findAll();
-        return shelterMapper.mapToShelterDtos(all);
+        return shelterRepository.findAll().stream()
+                .map(shelterMapper::mapToShelterDto)
+                .collect(Collectors.toList());
     }
 
 }

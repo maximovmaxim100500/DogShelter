@@ -33,7 +33,9 @@ public class PetService {
      */
     public PetDto addPet(PetDto petDto) {
         Pet pet = petMapper.mapToPet(petDto);
+        System.out.println("Mapped Pet: " + pet);
         Pet savedPet = petRepository.save(pet);
+        System.out.println("Saved Pet: " + savedPet);
         return petMapper.mapToPetDto(savedPet);
     }
 
