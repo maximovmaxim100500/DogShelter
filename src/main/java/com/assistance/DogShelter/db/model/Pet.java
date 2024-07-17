@@ -40,6 +40,6 @@ public class Pet {
     @JoinColumn(name = "shelter_id", nullable = false)
     private Shelter shelter;    // связать с классом Shelter
 
-    @Column(name = "date_adoption")       // дата усыновления
+    @Column(name = "date_adoption", nullable = true)       // дата усыновления
     private LocalDate dateAdoption;
 }

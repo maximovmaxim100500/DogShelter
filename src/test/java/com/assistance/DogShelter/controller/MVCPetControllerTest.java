@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -74,8 +75,8 @@ class MVCPetControllerTest {
     void getAllPetsTest() throws Exception {
         // Создаем и сохраняем питомцев в сервисе или базе данных
         List<PetDto> pets = Arrays.asList(
-                new PetDto(1, "Рекс", "Лабрадор", 3, "Сухой корм", null),
-                new PetDto(2, "Вискас", "Немецкая овчарка", 2, "Сухой корм", null)
+                new PetDto(1, "Рекс", "Лабрадор", 3, "Сухой корм", null, LocalDate.now()),
+                new PetDto(2, "Вискас", "Немецкая овчарка", 2, "Сухой корм", null, LocalDate.now())
         );
         when(petService.getAllPets()).thenReturn(pets);
 

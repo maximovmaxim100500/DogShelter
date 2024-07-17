@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Component  //Аннотация указывает что это компонент Spring
 public class DailyMessageScheduler {
@@ -40,13 +41,16 @@ public class DailyMessageScheduler {
                 LocalDate date1 = pet.getDateAdoption();    //Если есть, то берем дату усыновления
                 LocalDate today = LocalDate.now();          //Дату сегодня
                 long differenceInDays = ChronoUnit.DAYS.between(date1, today); //Вычисляем разницу в днях
-                User user = userRepository.findById(pet.getUser().getId());    //находим усыновителя этого питомца
-                if (differenceInDays <= DAYS_TO_SEND && !user.isExtension()){  //Проверяем находится ли пользователь на продленке
-                                                                               // и сколько уже дней присылает отчеты.
-                    telegramBot.sendMessage(user.getChatId(), message);        //отправляем сообщение пользователю
-                } else if (differenceInDays <= DAYS_EXTENSION && user.isExtension()) { //Проверяем находится ли пользователь на продленке
-                                                                                       // и сколько уже дней присылает отчеты.
-                    telegramBot.sendMessage(user.getChatId(), message2);        //отправляем сообщение пользователю
+                Optional<User> optionalUser = userRepository.findById(pet.getUser().getId());    //находим усыновителя этого питомца
+                if(optionalUser.isPresent()) {
+                    User user = optionalUser.get();
+                    if (differenceInDays <= DAYS_TO_SEND && !user.isExtension()){  //Проверяем находится ли пользователь на продленке
+                        // и сколько уже дней присылает отчеты.
+                        telegramBot.sendMessage(user.getChatId(), message);        //отправляем сообщение пользователю
+                    } else if (differenceInDays <= DAYS_EXTENSION && user.isExtension()) { //Проверяем находится ли пользователь на продленке
+                        // и сколько уже дней присылает отчеты.
+                        telegramBot.sendMessage(user.getChatId(), message2);        //отправляем сообщение пользователю
+                    }
                 }
             }
         }
