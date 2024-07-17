@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.glassfish.jersey.spi.Contract;
 
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +46,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Report> reports; //связать с классом Report
 
-    @Column(name = "extension", nullable = false)
+    @Column(name = "extension", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean extension;       //Статус для отчетности. Срок продлен или нет.
 }
