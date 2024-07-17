@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -63,8 +62,8 @@ public class ReportSendFormService {
         long chatId = update.getMessage().getChatId();
         String messageText = update.getMessage().getText();
         TelegramBot bot = applicationContext.getBean(TelegramBot.class);
-        if (update.hasMessage() && update.getMessage().hasText()) {
 
+        if (update.hasMessage() && update.getMessage().hasText()) {
             if (isAwaitingText(chatId) && !isTextCreate) {
                 report = createReport(chatId, messageText);
                 bot.sendMessage(chatId, "Пожалуйста, прикрепите фото:");
@@ -109,16 +108,20 @@ public class ReportSendFormService {
         TelegramBot bot = applicationContext.getBean(TelegramBot.class);
         PhotoSize photo = update.getMessage().getPhoto().get(0);
 
-
-        photoReport.setFilePath(photo.getFilePath());
-        photoReport.setFileSize((long) photo.getFileSize());
         PhotoReport photoReport = new PhotoReport();
+        photoReport.setFilePath(photo.getFileId());
+        photoReport.setFileSize((long) photo.getFileSize());
+        photoReport.setMediaType("image/jpeg"); // Пример, можно изменить в зависимости от типа файла
+
+        // Загрузка данных изображения из Telegram API
+        byte[] imageData = bot.downloadFileBytes(photo.getFileId());
+        photoReport.setData(imageData);
+
         photoReport.setReport(report);
         return photoReport;
     }
 
     private void finishSendReport(long chatId) {
-
         TelegramBot bot = applicationContext.getBean(TelegramBot.class);
         bot.sendMessage(chatId, "Отчёт отправлен! Спасибо.");
         reportRepository.save(report);

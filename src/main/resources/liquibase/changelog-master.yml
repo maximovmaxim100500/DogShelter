@@ -1,7 +1,7 @@
 databaseChangeLog:
   - property:
       name: changeset.id.sequence
-      value: 11
+      value: 13
 
   - changeSet:
       id: 1
@@ -86,3 +86,10 @@ databaseChangeLog:
       changes:
         - sqlFile:
             path: liquibase/scripts/reports-tables-column-user-id.sql
+
+  - changeSet:
+      id: 13
+      author: dsiliukov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/users-delete-report-id.sql

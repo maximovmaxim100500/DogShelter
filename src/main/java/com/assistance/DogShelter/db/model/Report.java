@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 
@@ -28,7 +29,7 @@ public class Report {
     @Column(nullable = false)       // дата отчета
     private LocalDate date;
 
-    @Column(nullable = false)       // статус отчета
+    @ColumnDefault("false")      // статус отчета
     private Boolean checkReport;
 
     @ManyToOne

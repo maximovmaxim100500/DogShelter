@@ -1,13 +1,12 @@
 package com.assistance.DogShelter.service;
 
-import com.assistance.DogShelter.db.model.DriveDirPicture;
 import com.assistance.DogShelter.db.model.PhotoReport;
 import com.assistance.DogShelter.db.model.Report;
 import com.assistance.DogShelter.db.repository.PhotoReportRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.*;

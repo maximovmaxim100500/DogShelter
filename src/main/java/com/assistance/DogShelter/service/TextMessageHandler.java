@@ -34,10 +34,14 @@ public class TextMessageHandler {
                     bot.sendMessage(chatId, "Список доступных команд:" +
                             "\n/start - Начать работу с ботом (меню)" +
                             "\n/register_volunteer - Регистрация волонтера" +
-                            "\n/help - Список команд");
+                            "\n/help - Список команд"+
+                            "\n/chat_id - Получить chatId текущего чата");
                     break;
                 case "/register_volunteer":
                     volunteerRegistrationService.registerVolunteer(update);
+                    break;
+                case "/chat_id":
+                    bot.sendMessage(chatId, "Ваш chatId: " + chatId);
                     break;
                 default:
                     // Обработка других текстовых сообщений

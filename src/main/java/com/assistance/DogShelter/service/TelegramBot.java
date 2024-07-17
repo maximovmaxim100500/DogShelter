@@ -5,12 +5,14 @@ import com.assistance.DogShelter.controller.dto.PetDto;
 import com.assistance.DogShelter.db.model.Pet;
 import com.assistance.DogShelter.db.model.Shelter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
@@ -18,6 +20,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 @Component
@@ -380,6 +384,29 @@ public class TelegramBot extends TelegramLongPollingBot {
             log.info("Отправлено сообщение с выбором приюта в чат: " + chatId);
         } catch (TelegramApiException e) {
             log.error("Ошибка при отправке сообщения с выбором приюта: " + e.getMessage(), e);
+        }
+    }
+    public byte[] downloadFileBytes(String fileId) {
+        try {
+            // Получение информации о файле с сервера Telegram
+            File file = execute(new org.telegram.telegrambots.meta.api.methods.GetFile(fileId));
+
+            // Определение пути к файлу на сервере Telegram
+            String filePath = file.getFilePath();
+
+            // Скачивание файла и возврат его содержимого в виде массива байтов
+            try (InputStream is = new java.net.URL(file.getFileUrl(getBotToken())).openStream();
+                 ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, bytesRead);
+                }
+                return os.toByteArray();
+            }
+        } catch (TelegramApiException | IOException e) {
+            log.error("Ошибка при скачивании файла: " + e.getMessage(), e);
+            return null;
         }
     }
 }
