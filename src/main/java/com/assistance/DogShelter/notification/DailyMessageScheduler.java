@@ -34,7 +34,7 @@ public class DailyMessageScheduler {
     @Scheduled(cron = "0 0 10 * * *") // Аннотация запускает метод каждый день в 10:00
     public void sendDailyMessage() {
         String message = "Добрый день! Ждем ваш ежедневный отчет.";
-        String message2 = "Продленка";
+        String message2 = "Вам продлили испытательный срок на 15 дней. Ждем ваш ежедневный отчет.";
         List<Pet> petList = petRepository.findAll();         //список всех питомцев
         for (Pet pet : petList) {                            //берем всех питомцев
             if (pet.getUser() != null) {                    //Проверяем по очереди есть ли у питомца user
@@ -42,14 +42,22 @@ public class DailyMessageScheduler {
                 LocalDate today = LocalDate.now();          //Дату сегодня
                 long differenceInDays = ChronoUnit.DAYS.between(date1, today); //Вычисляем разницу в днях
                 Optional<User> optionalUser = userRepository.findById(pet.getUser().getId());    //находим усыновителя этого питомца
-                if(optionalUser.isPresent()) {
+                if (optionalUser.isPresent()) {
                     User user = optionalUser.get();
-                    if (differenceInDays <= DAYS_TO_SEND && !user.isExtension()){  //Проверяем находится ли пользователь на продленке
-                        // и сколько уже дней присылает отчеты.
+                    if (differenceInDays <= DAYS_TO_SEND) {  //Проверяем сколько дней user присылает отчеты
                         telegramBot.sendMessage(user.getChatId(), message);        //отправляем сообщение пользователю
-                    } else if (differenceInDays <= DAYS_EXTENSION && user.isExtension()) { //Проверяем находится ли пользователь на продленке
+                    } else if (differenceInDays == DAYS_TO_SEND + 1 && !user.isExtension()) {
+                        telegramBot.sendMessage(user.getChatId(), "Ваш испытательный срок успешно пройден!");
+                    } else if (differenceInDays == DAYS_TO_SEND + 1 && user.isExtension()) {
+                        //Проверяем находится ли пользователь на продленке
                         // и сколько уже дней присылает отчеты.
-                        telegramBot.sendMessage(user.getChatId(), message2);        //отправляем сообщение пользователю
+                        telegramBot.sendMessage(user.getChatId(), message2);         //отправляем сообщение пользователю
+                    } else if (differenceInDays > DAYS_TO_SEND && differenceInDays <= DAYS_EXTENSION && user.isExtension()) {
+                        //Проверяем находится ли пользователь на продленке
+                        // и сколько уже дней присылает отчеты.
+                        telegramBot.sendMessage(user.getChatId(), message);         //отправляем сообщение пользователю
+                    } else if (differenceInDays == DAYS_EXTENSION + 1 && user.isExtension()) {
+                        telegramBot.sendMessage(user.getChatId(), "Время испытательного срока вышло. Ожидайте решения приюта.");
                     }
                 }
             }
