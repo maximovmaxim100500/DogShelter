@@ -5,7 +5,6 @@ import com.assistance.DogShelter.controller.dto.PetDto;
 import com.assistance.DogShelter.db.model.AppPhoto;
 import com.assistance.DogShelter.db.model.Shelter;
 import com.assistance.DogShelter.exceptions.UploadFileException;
-import com.assistance.DogShelter.service.enums.LinkType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

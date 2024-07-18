@@ -10,14 +10,19 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @Slf4j
 public class TextMessageHandler {
 
-    @Autowired
-    private VolunteerRegistrationService volunteerRegistrationService;
+    private final VolunteerRegistrationService volunteerRegistrationService;
+
+    private final ReportSendFormService reportSendFormService;
+
+    private final ApplicationContext applicationContext;
 
     @Autowired
-    private ReportSendFormService reportSendFormService;
+    public TextMessageHandler(VolunteerRegistrationService volunteerRegistrationService, ReportSendFormService reportSendFormService, ApplicationContext applicationContext) {
+        this.volunteerRegistrationService = volunteerRegistrationService;
+        this.reportSendFormService = reportSendFormService;
+        this.applicationContext = applicationContext;
+    }
 
-    @Autowired
-    private ApplicationContext applicationContext;
 
     public void handleTextMessage(Update update) {
         // Проверка, что сообщение является текстовым

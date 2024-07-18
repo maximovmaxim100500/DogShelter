@@ -7,7 +7,6 @@ import com.assistance.DogShelter.db.repository.PhotoReportRepository;
 import com.assistance.DogShelter.db.repository.ReportRepository;
 import com.assistance.DogShelter.db.repository.UserRepository;
 import com.assistance.DogShelter.exceptions.UploadFileException;
-import com.assistance.DogShelter.service.enums.LinkType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +16,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Slf4j

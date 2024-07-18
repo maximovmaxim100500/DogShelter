@@ -27,7 +27,7 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Transactional
 public class PhotoReportService {
 
-    @Value("/photoReports}") // Правильный способ использования значения из application.properties
+    @Value("/reportDir") // Правильный способ использования значения из application.properties
     private String reportDir;
 
     private final PhotoReportRepository photoReportRepository;
