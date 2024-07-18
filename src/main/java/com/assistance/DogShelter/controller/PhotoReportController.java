@@ -68,4 +68,15 @@ public class PhotoReportController {
             is.transferTo(os);
         }
     }
+    @GetMapping(value = "/telegramFile")
+    public ResponseEntity<byte[]> downloadTelegramFile(@RequestParam String telegramFileId) {
+        byte[] fileData = photoReportService.getTelegramFile(telegramFileId);
+
+        // Set response headers
+        HttpHeaders headers = new HttpHeaders();
+        // Assuming the file type is image/jpeg, update as per your actual file type
+        headers.setContentType(MediaType.IMAGE_JPEG); // Replace with actual media type
+
+        return ResponseEntity.ok().headers(headers).body(fileData);
+    }
 }
