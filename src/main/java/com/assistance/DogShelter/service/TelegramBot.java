@@ -2,8 +2,10 @@ package com.assistance.DogShelter.service;
 
 import com.assistance.DogShelter.config.BotConfig;
 import com.assistance.DogShelter.controller.dto.PetDto;
-import com.assistance.DogShelter.db.model.Pet;
+import com.assistance.DogShelter.db.model.AppPhoto;
 import com.assistance.DogShelter.db.model.Shelter;
+import com.assistance.DogShelter.exceptions.UploadFileException;
+import com.assistance.DogShelter.service.enums.LinkType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,14 +31,16 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final TextMessageHandler textMessageHandler;
     private final PetService petService;
     private final ShelterService shelterService;
+    private final FileService fileService;
 
     @Autowired
-    public TelegramBot(BotConfig botConfig, CallBackQueryHandler callBackQueryHandler, TextMessageHandler textMessageHandler, PetService petService, ShelterService shelterService) {
+    public TelegramBot(BotConfig botConfig, CallBackQueryHandler callBackQueryHandler, TextMessageHandler textMessageHandler, PetService petService, ShelterService shelterService, FileService fileService) {
         this.botConfig = botConfig;
         this.callBackQueryHandler = callBackQueryHandler;
         this.textMessageHandler = textMessageHandler;
         this.petService = petService;
         this.shelterService = shelterService;
+        this.fileService = fileService;
 
         // Инициализация списка команд для бота
         List<BotCommand> listOfCommands = new ArrayList<>();
@@ -380,6 +384,18 @@ public class TelegramBot extends TelegramLongPollingBot {
             log.info("Отправлено сообщение с выбором приюта в чат: " + chatId);
         } catch (TelegramApiException e) {
             log.error("Ошибка при отправке сообщения с выбором приюта: " + e.getMessage(), e);
+        }
+    }
+    public void processPhotoMessage(Update update) {
+        var chatId = update.getMessage().getChatId();
+        try {
+            AppPhoto photo = fileService.processPhoto(update.getMessage());
+            var answer = "Фото успешно загружено! ";
+            sendMessage(chatId, answer);
+        } catch (UploadFileException ex) {
+            log.error("Ошибка при загрузке файла");
+            String error = "К сожалению, загрузка фото не удалась. Повторите попытку позже.";
+            sendMessage(chatId, error);
         }
     }
 }

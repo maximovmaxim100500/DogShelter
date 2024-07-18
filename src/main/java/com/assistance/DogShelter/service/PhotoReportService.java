@@ -1,13 +1,12 @@
 package com.assistance.DogShelter.service;
 
-import com.assistance.DogShelter.db.model.DriveDirPicture;
 import com.assistance.DogShelter.db.model.PhotoReport;
 import com.assistance.DogShelter.db.model.Report;
 import com.assistance.DogShelter.db.repository.PhotoReportRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -15,6 +14,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
@@ -25,8 +26,10 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Service
 @Transactional
 public class PhotoReportService {
-    @Value("/photoReports")
-    String reportDir;
+
+    @Value("/photoReports}") // Правильный способ использования значения из application.properties
+    private String reportDir;
+
     private final PhotoReportRepository photoReportRepository;
     private final ReportService reportService;
 
@@ -38,17 +41,15 @@ public class PhotoReportService {
 
     public void uploadCover(Long reportId, MultipartFile file) throws IOException {
         Report report = reportService.findReportById(reportId);
-        Path filePath = Path.of(reportDir,reportId + "." + getExtension(Objects.requireNonNull(file.getOriginalFilename())));
+        Path filePath = Paths.get(reportDir, reportId + "." + getExtension(Objects.requireNonNull(file.getOriginalFilename())));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
 
-        try(InputStream is = file.getInputStream();
-            OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
-            BufferedInputStream bis = new BufferedInputStream(is, 1024);
-            BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
-        ) {
-            bis.transferTo(bos);
+        try (InputStream is = file.getInputStream();
+             OutputStream os = Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW)) {
+            is.transferTo(os);
         }
+
         PhotoReport photoReport = findPicture(reportId);
         photoReport.setReport(report);
         photoReport.setFilePath(filePath.toString());
@@ -57,6 +58,7 @@ public class PhotoReportService {
         photoReport.setData(generateImagePreview(filePath));
         photoReportRepository.save(photoReport);
     }
+
     public PhotoReport findPicture(Long reportId) {
         return photoReportRepository.findByReportId(reportId).orElse(new PhotoReport());
     }
