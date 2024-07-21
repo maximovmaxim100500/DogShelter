@@ -1,4 +1,4 @@
-package com.assistance.DogShelter.db.model;
+package com.assistance.DogShelter.db.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,12 +14,14 @@ import java.util.Objects;
 @Table(name = "binary_content")
 @Entity
 public class BinaryContent {
+    /* BinaryContent представляет собой бинарное содержимое файла и хранит его данные в базе данных. */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private byte[] fileAsArrayOfBytes;
+    /* Это поле будет использоваться для хранения содержимого файла непосредственно в базе данных. */
 
     @Override
     public boolean equals(Object o) {

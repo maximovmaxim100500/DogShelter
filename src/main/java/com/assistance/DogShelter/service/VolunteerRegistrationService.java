@@ -1,6 +1,6 @@
 package com.assistance.DogShelter.service;
 
-import com.assistance.DogShelter.db.model.Volunteer;
+import com.assistance.DogShelter.db.entity.Volunteer;
 import com.assistance.DogShelter.db.repository.VolunteerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

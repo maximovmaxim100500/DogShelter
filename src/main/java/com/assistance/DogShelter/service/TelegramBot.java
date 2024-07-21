@@ -2,16 +2,19 @@ package com.assistance.DogShelter.service;
 
 import com.assistance.DogShelter.config.BotConfig;
 import com.assistance.DogShelter.controller.dto.PetDto;
-import com.assistance.DogShelter.db.model.AppPhoto;
-import com.assistance.DogShelter.db.model.Shelter;
-import com.assistance.DogShelter.exceptions.UploadFileException;
+import com.assistance.DogShelter.db.entity.Pet;
+import com.assistance.DogShelter.db.entity.Shelter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.File;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
@@ -19,6 +22,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 @Component
@@ -30,16 +35,14 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final TextMessageHandler textMessageHandler;
     private final PetService petService;
     private final ShelterService shelterService;
-    private final FileService fileService;
 
     @Autowired
-    public TelegramBot(BotConfig botConfig, CallBackQueryHandler callBackQueryHandler, TextMessageHandler textMessageHandler, PetService petService, ShelterService shelterService, FileService fileService) {
+    public TelegramBot(BotConfig botConfig, CallBackQueryHandler callBackQueryHandler, TextMessageHandler textMessageHandler, PetService petService, ShelterService shelterService) {
         this.botConfig = botConfig;
         this.callBackQueryHandler = callBackQueryHandler;
         this.textMessageHandler = textMessageHandler;
         this.petService = petService;
         this.shelterService = shelterService;
-        this.fileService = fileService;
 
         // Инициализация списка команд для бота
         List<BotCommand> listOfCommands = new ArrayList<>();
@@ -70,7 +73,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (update.hasCallbackQuery()) {
             callBackQueryHandler.handleCallbackQuery(update);
         } else {
-            textMessageHandler.handleTextMessage(update);
+            try {
+                textMessageHandler.handleTextMessage(update);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -383,18 +392,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             log.info("Отправлено сообщение с выбором приюта в чат: " + chatId);
         } catch (TelegramApiException e) {
             log.error("Ошибка при отправке сообщения с выбором приюта: " + e.getMessage(), e);
-        }
-    }
-    public void processPhotoMessage(Update update) {
-        var chatId = update.getMessage().getChatId();
-        try {
-            AppPhoto photo = fileService.processPhoto(update.getMessage());
-            var answer = "Фото успешно загружено! ";
-            sendMessage(chatId, answer);
-        } catch (UploadFileException ex) {
-            log.error("Ошибка при загрузке файла");
-            String error = "К сожалению, загрузка фото не удалась. Повторите попытку позже.";
-            sendMessage(chatId, error);
         }
     }
 }
