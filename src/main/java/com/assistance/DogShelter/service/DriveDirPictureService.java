@@ -1,7 +1,7 @@
 package com.assistance.DogShelter.service;
 
-import com.assistance.DogShelter.db.model.DriveDirPicture;
-import com.assistance.DogShelter.db.model.Shelter;
+import com.assistance.DogShelter.db.entity.DriveDirPicture;
+import com.assistance.DogShelter.db.entity.Shelter;
 import com.assistance.DogShelter.db.repository.DriveDirPictureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

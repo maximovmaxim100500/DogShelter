@@ -1,19 +1,14 @@
 package com.assistance.DogShelter.service;
 
-import com.assistance.DogShelter.controller.dto.PetDto;
 import com.assistance.DogShelter.controller.dto.ShelterDto;
-import com.assistance.DogShelter.db.model.Pet;
-import com.assistance.DogShelter.db.model.Shelter;
+import com.assistance.DogShelter.db.entity.Shelter;
 import com.assistance.DogShelter.db.repository.ShelterRepository;
 import com.assistance.DogShelter.mapper.ShelterMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Сервис для работы с приютами.

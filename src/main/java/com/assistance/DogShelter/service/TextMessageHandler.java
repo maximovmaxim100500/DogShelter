@@ -5,26 +5,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.io.IOException;
 
 @Component
 @Slf4j
 public class TextMessageHandler {
 
-    private final VolunteerRegistrationService volunteerRegistrationService;
-
-    private final ReportSendFormService reportSendFormService;
-
-    private final ApplicationContext applicationContext;
+    @Autowired
+    private VolunteerRegistrationService volunteerRegistrationService;
 
     @Autowired
-    public TextMessageHandler(VolunteerRegistrationService volunteerRegistrationService, ReportSendFormService reportSendFormService, ApplicationContext applicationContext) {
-        this.volunteerRegistrationService = volunteerRegistrationService;
-        this.reportSendFormService = reportSendFormService;
-        this.applicationContext = applicationContext;
-    }
+    private ReportSendFormService reportSendFormService;
 
+    @Autowired
+    private ApplicationContext applicationContext;
 
-    public void handleTextMessage(Update update) {
+    public void handleTextMessage(Update update) throws TelegramApiException, IOException {
         // Проверка, что сообщение является текстовым
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();

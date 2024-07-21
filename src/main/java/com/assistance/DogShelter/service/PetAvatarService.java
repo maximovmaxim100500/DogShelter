@@ -1,8 +1,8 @@
 package com.assistance.DogShelter.service;
 
 import com.assistance.DogShelter.controller.dto.PetDto;
-import com.assistance.DogShelter.db.model.Pet;
-import com.assistance.DogShelter.db.model.PetAvatar;
+import com.assistance.DogShelter.db.entity.Pet;
+import com.assistance.DogShelter.db.entity.PetAvatar;
 import com.assistance.DogShelter.db.repository.PetAvatarRepository;
 import com.assistance.DogShelter.mapper.PetMapper;
 import org.springframework.beans.factory.annotation.Autowired;

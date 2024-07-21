@@ -1,4 +1,4 @@
-package com.assistance.DogShelter.db.model;
+package com.assistance.DogShelter.db.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public class PhotoReport {
     private String mediaType;       //тип файла
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = true)
     private byte[] data;            //данные изображения в виде массива байт
 
     @OneToOne
