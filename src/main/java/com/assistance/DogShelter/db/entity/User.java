@@ -1,7 +1,9 @@
-package com.assistance.DogShelter.db.model;
+package com.assistance.DogShelter.db.entity;
 
 // Модель, представляющая пользователя
 
+import com.assistance.DogShelter.db.entity.Pet;
+import com.assistance.DogShelter.db.entity.Report;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

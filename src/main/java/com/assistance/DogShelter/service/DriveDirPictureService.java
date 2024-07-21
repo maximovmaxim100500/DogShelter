@@ -1,8 +1,10 @@
 package com.assistance.DogShelter.service;
 
+import com.assistance.DogShelter.controller.dto.ShelterDto;
 import com.assistance.DogShelter.db.entity.DriveDirPicture;
 import com.assistance.DogShelter.db.entity.Shelter;
 import com.assistance.DogShelter.db.repository.DriveDirPictureRepository;
+import com.assistance.DogShelter.mapper.ShelterMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -29,15 +32,22 @@ public class DriveDirPictureService {
     private String drivePictureDir; //Название папки, где будем хранить обложки
     private final DriveDirPictureRepository driveDirPictureRepository;
     private final ShelterService shelterService;
+    private final ShelterMapper shelterMapper;
 
     @Autowired
-    public DriveDirPictureService(DriveDirPictureRepository driveDirPictureRepository, ShelterService shelterService) {
+    public DriveDirPictureService(DriveDirPictureRepository driveDirPictureRepository, ShelterService shelterService, ShelterMapper shelterMapper) {
         this.driveDirPictureRepository = driveDirPictureRepository;
         this.shelterService = shelterService;
+        this.shelterMapper = shelterMapper;
     }
 
     public void uploadCover(Long shelterId, MultipartFile file) throws IOException {
-        Shelter shelter = shelterService.findShelterById(shelterId);
+        Optional<ShelterDto> shelterDto = shelterService.findShelterById(shelterId);
+        if (shelterDto.isPresent()) {
+            throw new IllegalArgumentException("Shelter not found for id: " + shelterId);
+        }
+
+        Shelter shelter = shelterMapper.mapToShelter(shelterDto.get());
         Path filePath = Path.of(drivePictureDir,shelterId + "." + getExtension(Objects.requireNonNull(file.getOriginalFilename())));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);

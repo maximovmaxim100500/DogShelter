@@ -1,6 +1,8 @@
 package com.assistance.DogShelter.service;
 
+import com.assistance.DogShelter.controller.dto.PetDto;
 import com.assistance.DogShelter.controller.dto.ShelterDto;
+import com.assistance.DogShelter.db.entity.Pet;
 import com.assistance.DogShelter.db.entity.Shelter;
 import com.assistance.DogShelter.db.repository.ShelterRepository;
 import com.assistance.DogShelter.mapper.ShelterMapper;
@@ -46,9 +48,9 @@ public class ShelterService {
      * @param id Идентификатор приюта.
      * @return Приют с указанным идентификатором, если найден.
      */
-    public Shelter findShelterById(Long id) {
-        Optional<Shelter> shelterOptional = shelterRepository.findById(id);
-        return shelterOptional.orElse(null);
+    public Optional<ShelterDto> findShelterById(Long id) {
+        Optional<Shelter> shelter = shelterRepository.findById(id);
+        return shelter.map(shelterMapper::mapToShelterDto);
     }
 
     /**

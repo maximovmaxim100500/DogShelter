@@ -2,22 +2,15 @@ package com.assistance.DogShelter.service;
 
 import com.assistance.DogShelter.config.BotConfig;
 import com.assistance.DogShelter.controller.dto.PetDto;
-import com.assistance.DogShelter.db.entity.Pet;
-import com.assistance.DogShelter.db.entity.Shelter;
 import com.assistance.DogShelter.controller.dto.ShelterDto;
-import com.assistance.DogShelter.db.model.Pet;
-import com.assistance.DogShelter.db.model.Shelter;
+import com.assistance.DogShelter.db.entity.Shelter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.File;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
@@ -25,8 +18,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.IOException;;
 import java.util.*;
 
 @Component
@@ -38,6 +30,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final TextMessageHandler textMessageHandler;
     private final PetService petService;
     private final ShelterService shelterService;
+    private final VolunteerService volunteerService;
 
     @Autowired
     public TelegramBot(BotConfig botConfig,
