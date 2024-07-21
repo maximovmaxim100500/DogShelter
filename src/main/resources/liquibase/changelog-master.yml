@@ -1,7 +1,7 @@
 databaseChangeLog:
   - property:
       name: changeset.id.sequence
-      value: 17
+      value: 18
 
   - changeSet:
       id: 1
@@ -114,3 +114,17 @@ databaseChangeLog:
       changes:
         - sqlFile:
             path: liquibase/scripts/photos-fix2.sql
+
+  - changeSet:
+      id: 17
+      author: dsiliukov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/pets-add.sql
+
+  - changeSet:
+      id: 18
+      author: dsiliukov
+      changes:
+        - sqlFile:
+            path: liquibase/scripts/users-add.sql

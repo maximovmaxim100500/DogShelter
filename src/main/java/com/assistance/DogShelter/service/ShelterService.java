@@ -49,7 +49,7 @@ public class ShelterService {
      * @return Приют с указанным идентификатором, если найден.
      */
     public Optional<ShelterDto> findShelterById(Long id) {
-        Optional<Shelter> shelter = shelterRepository.findById(id);
+        Optional<Shelter> shelter = shelterRepository.findByIdWithPets(id);
         return shelter.map(shelterMapper::mapToShelterDto);
     }
 
