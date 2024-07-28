@@ -1,6 +1,7 @@
 package com.assistance.DogShelter.db.repository;
 
 import com.assistance.DogShelter.db.entity.Pet;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
